@@ -1,4 +1,4 @@
-package jbnu.se.voting;
+package jbnu.se.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
