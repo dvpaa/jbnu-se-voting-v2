@@ -21,11 +21,8 @@ public class Candidate extends BaseEntity {
     @JoinColumn(name = "headquaters_id")
     private Headquaters headquaters;
 
-    @Column(nullable = false)
-    private String studentId;
-
-    @Column(nullable = false)
-    private String name;
+    @Embedded
+    private Member member;
 
     @Column(nullable = false)
     @Enumerated(STRING)

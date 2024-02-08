@@ -21,11 +21,8 @@ public class Pollbook extends BaseEntity {
     @JoinColumn(name = "election_id")
     private Election election;
 
-    @Column(nullable = false)
-    private String studentId;
-
-    @Column(nullable = false)
-    private String name;
+    @Embedded
+    private Member member;
 
     @Column(nullable = false)
     @ColumnDefault("false")
