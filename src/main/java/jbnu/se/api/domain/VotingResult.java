@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -23,4 +25,6 @@ public class VotingResult {
      */
     @Column(nullable = false)
     private String result;
+
+    private LocalDateTime createdDate;
 }
