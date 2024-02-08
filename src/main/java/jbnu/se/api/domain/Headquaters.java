@@ -18,6 +18,7 @@ public class Headquaters {
     private Election election;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pledge_id")
     private Pledge pledge;
 
     @Column(nullable = false)
