@@ -4,16 +4,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.*;
+import static jakarta.persistence.GenerationType.*;
+
 @Entity
 @Getter
 @Setter
 public class Candidate extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "headquaters_id")
     private Headquaters headquaters;
 
@@ -24,11 +28,11 @@ public class Candidate extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private Grade grade;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private CandidateType type;
 
 }

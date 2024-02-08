@@ -6,13 +6,16 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.EnumType.*;
+import static jakarta.persistence.GenerationType.*;
+
 @Entity
 @Getter
 @Setter
 public class Election extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -25,6 +28,6 @@ public class Election extends BaseEntity {
     private LocalDateTime endDate;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private ElectionType electionType;
 }
