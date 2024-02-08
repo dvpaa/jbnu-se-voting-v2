@@ -18,9 +18,11 @@ public class Pollbook {
     @JoinColumn(name = "election_id")
     private Election election;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(nullable = false)
+    private String studentId;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
     @ColumnDefault("false")
