@@ -44,8 +44,6 @@ class JwtTest {
     @DisplayName("토큰에 저장된 값을 꺼내올 수 있다.")
     void getClaimFromToken() {
         // given
-        String secretString = "fYDvRN4fpGM5fOES3e/V3sY7uiKJu97HXVd9u9I0RgM=";
-        SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
         UserPrincipal userPrincipal = UserPrincipal.builder()
                 .userId("id")
                 .username("name")
@@ -68,8 +66,6 @@ class JwtTest {
     @DisplayName("만료된 토큰은 사용할 수 없다.")
     void tokenExpiredTest() {
         //given
-        String secretString = "fYDvRN4fpGM5fOES3e/V3sY7uiKJu97HXVd9u9I0RgM=";
-        SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
         UserPrincipal userPrincipal = UserPrincipal.builder()
                 .userId("id")
                 .username("name")
