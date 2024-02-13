@@ -1,5 +1,6 @@
 package jbnu.se.api.config;
 
+import jbnu.se.api.security.JwtFilter;
 import jbnu.se.api.security.JwtUtil;
 import jbnu.se.api.security.OasisAuthenticationProvider;
 import jbnu.se.api.security.OasisLoginFilter;
@@ -44,12 +45,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .formLogin(AbstractHttpConfigurer::disable)
+
                 .httpBasic(AbstractHttpConfigurer::disable)
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(oasisLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+
+                .addFilterAt(oasisLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter(), OasisLoginFilter.class)
+
                 .authenticationProvider(authenticationProvider())
+
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
@@ -66,5 +74,10 @@ public class SecurityConfig {
     @Bean
     public OasisLoginFilter oasisLoginFilter() throws Exception {
         return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtil);
+    }
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter(jwtUtil);
     }
 }
