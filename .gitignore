@@ -39,3 +39,6 @@ out/
 
 ### http file ###
 *.http
+
+### profile ###
+/src/main/resources/application-auth.yml
