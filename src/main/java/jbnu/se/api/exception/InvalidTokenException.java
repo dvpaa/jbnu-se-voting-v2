@@ -2,11 +2,11 @@ package jbnu.se.api.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class TokenExpiredException extends ApplicationException {
+public class InvalidTokenException extends ApplicationException {
 
-    private static final String MESSAGE = "만료된 토큰입니다.";
+    private static final String MESSAGE = "유효하지 않은 토큰입니다.";
 
-    public TokenExpiredException() {
+    public InvalidTokenException() {
         super(MESSAGE);
     }
 

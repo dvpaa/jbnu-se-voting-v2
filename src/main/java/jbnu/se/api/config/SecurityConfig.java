@@ -1,9 +1,9 @@
 package jbnu.se.api.config;
 
 import jbnu.se.api.security.JwtFilter;
-import jbnu.se.api.security.JwtUtil;
 import jbnu.se.api.security.OasisAuthenticationProvider;
 import jbnu.se.api.security.OasisLoginFilter;
+import jbnu.se.api.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    private final JwtUtil jwtUtil;
+    private final JwtUtils jwtUtils;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -73,11 +73,11 @@ public class SecurityConfig {
 
     @Bean
     public OasisLoginFilter oasisLoginFilter() throws Exception {
-        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtil);
+        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtils);
     }
 
     @Bean
     public JwtFilter jwtFilter() {
-        return new JwtFilter(jwtUtil);
+        return new JwtFilter(jwtUtils);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class OasisAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -55,5 +56,19 @@ public class OasisAuthenticationToken extends AbstractAuthenticationToken {
     public void eraseCredentials() {
         super.eraseCredentials();
         this.credentials = null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        OasisAuthenticationToken that = (OasisAuthenticationToken) o;
+        return Objects.equals(getPrincipal(), that.getPrincipal()) && Objects.equals(getCredentials(), that.getCredentials());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getPrincipal(), getCredentials());
     }
 }

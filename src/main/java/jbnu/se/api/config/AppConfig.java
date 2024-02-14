@@ -1,6 +1,6 @@
 package jbnu.se.api.config;
 
-import jbnu.se.api.security.JwtUtil;
+import jbnu.se.api.util.JwtUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -25,7 +25,7 @@ public class AppConfig {
     }
 
     @Bean
-    public JwtUtil jwtUtil() {
-        return new JwtUtil(authProperties());
+    public JwtUtils jwtUtils() {
+        return new JwtUtils(authProperties());
     }
 }
