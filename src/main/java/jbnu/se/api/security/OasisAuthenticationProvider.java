@@ -1,11 +1,12 @@
 package jbnu.se.api.security;
 
 import jbnu.se.api.config.AuthProperties;
+import jbnu.se.api.exception.FailureApiCallException;
+import jbnu.se.api.exception.UnauthorizedException;
 import jbnu.se.api.request.OasisApiRequest;
 import jbnu.se.api.response.OasisApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,21 +37,25 @@ public class OasisAuthenticationProvider implements AuthenticationProvider {
         OasisApiRequest oasisApiRequest = makeApiRequest(username, password);
         OasisApiResponse oasisApiResponse = callOasisApi(oasisApiRequest);
 
-        if (oasisApiResponse == null || oasisApiResponse.getUsers() == null) {
-            throw new RuntimeException("api 호출 실패");
+        if (!isSuccessfulApiCall(oasisApiResponse)) {
+            throw new FailureApiCallException();
         }
 
-        if (oasisApiResponse.getUsers().isEmpty()) {
-            throw new BadCredentialsException("아이디 또는 비밀번호가 올바르지 않습니다.");
-        }
-
-        if (!oasisApiResponse.getUsers().get(0).getStudentId().equals(username)) {
-            throw new BadCredentialsException("인증실패");
+        if (!isValidUser(oasisApiResponse)) {
+            throw new UnauthorizedException();
         }
 
         UserPrincipal userPrincipal = makeUserInfo(oasisApiResponse);
 
         return OasisAuthenticationToken.authenticated(username, password, userPrincipal, getSingleAuthority("ROLE_USER"));
+    }
+
+    private boolean isValidUser(OasisApiResponse oasisApiResponse) {
+        return !oasisApiResponse.getUsers().isEmpty();
+    }
+
+    private boolean isSuccessfulApiCall(OasisApiResponse oasisApiResponse) {
+        return oasisApiResponse != null && oasisApiResponse.getUsers() != null;
     }
 
     private List<SimpleGrantedAuthority> getSingleAuthority(String role) {
