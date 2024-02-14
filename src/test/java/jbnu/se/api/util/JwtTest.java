@@ -1,4 +1,4 @@
-package jbnu.se.api.security;
+package jbnu.se.api.util;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jbnu.se.api.config.AppConfig;
 import jbnu.se.api.config.AuthProperties;
 import jbnu.se.api.exception.InvalidTokenException;
-import jbnu.se.api.util.JwtUtils;
+import jbnu.se.api.security.UserPrincipal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
