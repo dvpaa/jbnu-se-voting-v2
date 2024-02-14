@@ -5,7 +5,8 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jbnu.se.api.config.AppConfig;
 import jbnu.se.api.config.AuthProperties;
-import jbnu.se.api.exception.TokenExpiredException;
+import jbnu.se.api.exception.InvalidTokenException;
+import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class JwtTest {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private AuthProperties authProperties;
 
     @Test
     @DisplayName("시크릿 키 암호와 및 복호와는 정상적으로 작동한다.")
@@ -51,10 +55,10 @@ class JwtTest {
                 .build();
 
         // when
-        String token = jwtUtil.generateToken(userPrincipal, 10000L);
-        String userIdFromToken = jwtUtil.getUserIdFromToken(token);
-        String usernameFromToken = jwtUtil.getUsernameFromToken(token);
-        String roleFromToken = jwtUtil.getUserRoleFromToken(token);
+        String token = jwtUtils.generateToken(userPrincipal, authProperties.getJwtInfo().getSecretKey(), 10000L);
+        String userIdFromToken = jwtUtils.getUserIdFromToken(token);
+        String usernameFromToken = jwtUtils.getUsernameFromToken(token);
+        String roleFromToken = jwtUtils.getUserRoleFromToken(token);
 
         // then
         assertThat(userIdFromToken).isEqualTo(userPrincipal.getUserId());
@@ -72,16 +76,49 @@ class JwtTest {
                 .role("role")
                 .build();
 
-        String token = jwtUtil.generateToken(userPrincipal, -1000L);
+        String token = jwtUtils.generateToken(userPrincipal, authProperties.getJwtInfo().getSecretKey(), -1000L);
 
         // when
-        Boolean tokenExpired = jwtUtil.isTokenExpired(token);
+        Boolean tokenExpired = jwtUtils.isValidToken(token);
 
         // then
         assertThat(tokenExpired).isTrue();
+    }
+
+    @Test
+    @DisplayName("만료된 토큰을 사용하려 하면 에러를 반환한다.")
+    void expiredTokenUsingTest() {
+        //given
+        UserPrincipal userPrincipal = UserPrincipal.builder()
+                .userId("id")
+                .username("name")
+                .role("role")
+                .build();
+
+        String token = jwtUtils.generateToken(userPrincipal, authProperties.getJwtInfo().getSecretKey(), -1000L);
 
         // expected
-        assertThatThrownBy(() -> jwtUtil.getUserIdFromToken(token))
-                .isInstanceOf(TokenExpiredException.class);
+        assertThatThrownBy(() -> jwtUtils.getUserIdFromToken(token))
+                .isInstanceOf(InvalidTokenException.class);
+    }
+
+    @Test
+    @DisplayName("시크릿키가 다르면 에러를 반환한다")
+    void inValidSecretKeyTest() {
+        // given
+        String secretString = "fYDvRN4fpGM5fOES3e/V3sY7uiKJu97HXVd9u9I0RgM=";
+        SecretKey secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
+
+        UserPrincipal userPrincipal = UserPrincipal.builder()
+                .userId("id")
+                .username("name")
+                .role("role")
+                .build();
+
+        String token = jwtUtils.generateToken(userPrincipal, secretKey, 10000L);
+
+        // expected
+        assertThatThrownBy(() -> jwtUtils.getUserIdFromToken(token))
+                .isInstanceOf(InvalidTokenException.class);
     }
 }
