@@ -2,7 +2,7 @@ package jbnu.se.api.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class FailureApiCallException extends ApplicationException {
+public class FailureApiCallException extends CustomAuthenticationException {
 
     private static final String MESSAGE = "인증에 실패하였습니다.";
 
