@@ -2,7 +2,6 @@ package jbnu.se.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jbnu.se.api.exception.CustomAuthenticationException;
@@ -18,6 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -45,7 +45,7 @@ public class OasisLoginFilter extends AbstractAuthenticationProcessingFilter {
 
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (POST_ONLY && !request.getMethod().equals("POST")) {
             throw new InvalidRequestException(request.getMethod());
         }
@@ -62,14 +62,14 @@ public class OasisLoginFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         UserPrincipal userPrincipal = (UserPrincipal) authResult.getDetails();
         String token = jwtUtils.generateToken(userPrincipal);
         response.addHeader(AUTHORIZATION, "Bearer " + token);
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
         CustomAuthenticationException exception = (CustomAuthenticationException) failed;
 
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -79,7 +79,7 @@ public class OasisLoginFilter extends AbstractAuthenticationProcessingFilter {
 
         response.setStatus(exception.getStatusCode());
         response.setContentType(APPLICATION_JSON_VALUE);
-        response.setContentType("charset=UTF-8");
+        response.setCharacterEncoding(UTF_8.name());
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 
