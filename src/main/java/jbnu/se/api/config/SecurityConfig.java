@@ -1,5 +1,6 @@
 package jbnu.se.api.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jbnu.se.api.security.JwtFilter;
 import jbnu.se.api.security.OasisAuthenticationProvider;
 import jbnu.se.api.security.OasisLoginFilter;
@@ -32,6 +33,8 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
 
     private final JwtUtils jwtUtils;
+
+    private final ObjectMapper objectMapper;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -73,7 +76,7 @@ public class SecurityConfig {
 
     @Bean
     public OasisLoginFilter oasisLoginFilter() throws Exception {
-        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtils);
+        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtils, objectMapper);
     }
 
     @Bean
