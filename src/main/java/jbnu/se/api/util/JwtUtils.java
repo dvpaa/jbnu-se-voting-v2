@@ -78,7 +78,7 @@ public class JwtUtils {
             final Date expiration = getAllClaimsFromToken(token).getExpiration();
             return isExpired(expiration);
         } catch (InvalidTokenException e) {  // secret or expired
-            return true;
+            return false;
         }
     }
 

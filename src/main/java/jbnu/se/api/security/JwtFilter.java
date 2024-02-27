@@ -51,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private boolean isInvalidToken(String token) {
-        return token == null || jwtUtils.isValidToken(token);
+        return token == null || !jwtUtils.isValidToken(token);
     }
 
     private UserPrincipal getUserPrincipalFromToken(String token) {
@@ -64,6 +64,5 @@ public class JwtFilter extends OncePerRequestFilter {
                 .username(username)
                 .role(role)
                 .build();
-
     }
 }

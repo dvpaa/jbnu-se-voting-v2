@@ -79,10 +79,10 @@ class JwtTest {
         String token = jwtUtils.generateToken(userPrincipal, authProperties.getJwtInfo().getSecretKey(), -1000L);
 
         // when
-        Boolean tokenExpired = jwtUtils.isValidToken(token);
+        boolean validToken = jwtUtils.isValidToken(token);
 
         // then
-        assertThat(tokenExpired).isTrue();
+        assertThat(validToken).isFalse();
     }
 
     @Test
