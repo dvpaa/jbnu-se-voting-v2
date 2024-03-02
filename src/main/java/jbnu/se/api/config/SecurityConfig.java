@@ -1,9 +1,6 @@
 package jbnu.se.api.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jbnu.se.api.security.JwtFilter;
-import jbnu.se.api.security.OasisAuthenticationProvider;
-import jbnu.se.api.security.OasisLoginFilter;
+import jbnu.se.api.security.*;
 import jbnu.se.api.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +31,9 @@ public class SecurityConfig {
 
     private final JwtUtils jwtUtils;
 
-    private final ObjectMapper objectMapper;
+    private final OasisAccessDeniedHandler oasisAccessDeniedHandler;
+
+    private final ExceptionResponseHandler exceptionResponseHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -64,7 +63,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/elections").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+
+                .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
+                        .accessDeniedHandler(oasisAccessDeniedHandler));
 
         return http.build();
     }
@@ -76,7 +78,7 @@ public class SecurityConfig {
 
     @Bean
     public OasisLoginFilter oasisLoginFilter() throws Exception {
-        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtils, objectMapper);
+        return new OasisLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtUtils, exceptionResponseHandler);
     }
 
     @Bean

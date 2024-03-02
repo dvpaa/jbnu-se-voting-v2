@@ -7,7 +7,6 @@ import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
-import jbnu.se.api.service.ElectionService;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,9 +38,6 @@ class ElectionControllerTest {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private ElectionService electionService;
-
-    @Autowired
     private ElectionRepository electionRepository;
 
     @AfterEach
@@ -50,7 +46,7 @@ class ElectionControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없으면 선거 등록 불가")
+    @DisplayName("관리자 권한이 없으면 에러 반환")
     void roleTest() throws Exception {
         // given
         ElectionRequest electionRequest = new ElectionRequest();
@@ -66,13 +62,13 @@ class ElectionControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest))
                 )
-                .andExpect(status().isCreated())
+                .andExpect(status().isForbidden())
                 .andDo(print());
     }
 
     @Test
     @DisplayName("관리자가 선거를 정상적으로 등록한다.")
-    void test() throws Exception {
+    void registerElectionTest() throws Exception {
         // given
         ElectionRequest electionRequest = new ElectionRequest();
         electionRequest.setTitle("test");
