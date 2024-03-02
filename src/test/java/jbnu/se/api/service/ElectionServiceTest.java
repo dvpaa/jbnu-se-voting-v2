@@ -1,7 +1,6 @@
 package jbnu.se.api.service;
 
 import jbnu.se.api.domain.Election;
-import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
@@ -12,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static java.time.LocalDateTime.of;
+import static jbnu.se.api.domain.ElectionType.SINGLE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -35,8 +37,8 @@ class ElectionServiceTest {
         // given
         ElectionRequest request = new ElectionRequest();
         request.setTitle("test");
-        request.setElectionType(ElectionType.SINGLE);
-        LocalDateTime startDate = LocalDateTime.of(2024, 2, 29, 19, 0);
+        request.setElectionType(SINGLE);
+        LocalDateTime startDate = of(2024, 2, 29, 19, 0);
         LocalDateTime endDate = startDate.plusDays(1);
         request.setStartDate(startDate);
         request.setEndDate(endDate);
@@ -50,5 +52,22 @@ class ElectionServiceTest {
         assertThat(election.getCreatedBy()).isEqualTo("1");
         assertThat(election.getPeriod()).isEqualTo(new Period(request.getStartDate(), request.getEndDate()));
         assertThat(election.getElectionType()).isEqualTo(request.getElectionType());
+    }
+
+    @Test
+    @DisplayName("모든 선거 조회")
+    void findAllElectionsTest() {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2024, 3, 2, 0, 0), of(2024, 3, 3, 0, 0)))
+                .electionType(SINGLE)
+                .build();
+
+        // when
+        electionRepository.save(election);
+        List<Election> elections = electionService.findAllElections();
+
+        assertThat(1).isEqualTo(elections.size());
     }
 }
