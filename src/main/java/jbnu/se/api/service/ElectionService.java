@@ -7,6 +7,8 @@ import jbnu.se.api.request.ElectionRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static java.time.LocalDateTime.now;
 
 @Service
@@ -25,5 +27,9 @@ public class ElectionService {
                 .build();
 
         electionRepository.save(election);
+    }
+
+    public List<Election> findAllElections() {
+        return electionRepository.findAll();
     }
 }
