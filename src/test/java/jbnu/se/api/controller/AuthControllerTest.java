@@ -114,14 +114,11 @@ class AuthControllerTest {
         // expected
         mockMvc.perform(post("/api/login")
                         .param("username", USER_ID)
-                        .param(
-                                "password", USER_PW + "error")
+                        .param("password", USER_PW + "error")
                         .contentType(APPLICATION_FORM_URLENCODED)
                 )
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("401"))
                 .andDo(print());
     }
-
-
 }
