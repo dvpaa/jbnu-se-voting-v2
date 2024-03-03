@@ -43,8 +43,8 @@ class ElectionServiceTest {
         request.setElectionType(SINGLE);
         LocalDateTime startDate = of(2024, 2, 29, 19, 0);
         LocalDateTime endDate = startDate.plusDays(1);
-        request.setStartDate(startDate);
-        request.setEndDate(endDate);
+        request.getPeriod().setStartDate(startDate);
+        request.getPeriod().setEndDate(endDate);
 
         // when
         electionService.registerElection("1", request);
@@ -53,7 +53,7 @@ class ElectionServiceTest {
         assertThat(electionRepository.count()).isEqualTo(1L);
         Election election = electionRepository.findAll().get(0);
         assertThat(election.getCreatedBy()).isEqualTo("1");
-        assertThat(election.getPeriod()).isEqualTo(new Period(request.getStartDate(), request.getEndDate()));
+        assertThat(election.getPeriod()).isEqualTo(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()));
         assertThat(election.getElectionType()).isEqualTo(request.getElectionType());
     }
 

@@ -22,7 +22,7 @@ public class ElectionService {
     public void registerElection(String userId, ElectionRequest request) {
         Election election = Election.builder()
                 .title(request.getTitle())
-                .period(new Period(request.getStartDate(), request.getEndDate()))
+                .period(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()))
                 .electionType(request.getElectionType())
                 .createdBy(userId)
                 .createdDate(now())

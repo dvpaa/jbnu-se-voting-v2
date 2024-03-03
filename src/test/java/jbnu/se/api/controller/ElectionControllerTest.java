@@ -60,8 +60,8 @@ class ElectionControllerTest {
         electionRequest.setTitle("test");
         LocalDateTime startDate = of(2024, 2, 29, 16, 0);
         LocalDateTime endDate = startDate.plusDays(1);
-        electionRequest.setStartDate(startDate);
-        electionRequest.setEndDate(endDate);
+        electionRequest.getPeriod().setStartDate(startDate);
+        electionRequest.getPeriod().setEndDate(endDate);
         electionRequest.setElectionType(SINGLE);
 
         mockMvc.perform(post("/api/elections")
@@ -81,8 +81,8 @@ class ElectionControllerTest {
         electionRequest.setTitle("test");
         LocalDateTime startDate = of(2024, 2, 29, 16, 0);
         LocalDateTime endDate = startDate.plusDays(1);
-        electionRequest.setStartDate(startDate);
-        electionRequest.setEndDate(endDate);
+        electionRequest.getPeriod().setStartDate(startDate);
+        electionRequest.getPeriod().setEndDate(endDate);
         electionRequest.setElectionType(SINGLE);
 
         // when
@@ -99,8 +99,8 @@ class ElectionControllerTest {
 
         Election election = electionRepository.findAll().get(0);
         assertThat(election.getTitle()).isEqualTo(electionRequest.getTitle());
-        assertThat(election.getPeriod().getStartDate()).isEqualTo(electionRequest.getStartDate());
-        assertThat(election.getPeriod().getEndDate()).isEqualTo(electionRequest.getEndDate());
+        assertThat(election.getPeriod().getStartDate()).isEqualTo(electionRequest.getPeriod().getStartDate());
+        assertThat(election.getPeriod().getEndDate()).isEqualTo(electionRequest.getPeriod().getEndDate());
     }
 
     @Test

@@ -12,9 +12,18 @@ public class ElectionRequest {
 
     private String title;
 
-    private LocalDateTime startDate;
-
-    private LocalDateTime endDate;
+    private Period period;
 
     private ElectionType electionType;
+
+    public ElectionRequest() {
+        this.period = new Period();
+    }
+
+    @Getter
+    @Setter
+    public static class Period {
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+    }
 }
