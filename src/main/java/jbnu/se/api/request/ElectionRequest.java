@@ -1,6 +1,5 @@
 package jbnu.se.api.request;
 
-import jbnu.se.api.domain.ElectionType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +13,7 @@ public class ElectionRequest {
 
     private Period period;
 
-    private ElectionType electionType;
+    private String electionType;
 
     public ElectionRequest() {
         this.period = new Period();

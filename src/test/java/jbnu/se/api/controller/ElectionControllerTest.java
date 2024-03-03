@@ -62,7 +62,7 @@ class ElectionControllerTest {
         LocalDateTime endDate = startDate.plusDays(1);
         electionRequest.getPeriod().setStartDate(startDate);
         electionRequest.getPeriod().setEndDate(endDate);
-        electionRequest.setElectionType(SINGLE);
+        electionRequest.setElectionType(SINGLE.name());
 
         mockMvc.perform(post("/api/elections")
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
@@ -83,7 +83,7 @@ class ElectionControllerTest {
         LocalDateTime endDate = startDate.plusDays(1);
         electionRequest.getPeriod().setStartDate(startDate);
         electionRequest.getPeriod().setEndDate(endDate);
-        electionRequest.setElectionType(SINGLE);
+        electionRequest.setElectionType(SINGLE.name());
 
         // when
         mockMvc.perform(post("/api/elections")

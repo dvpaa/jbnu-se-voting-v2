@@ -1,6 +1,7 @@
 package jbnu.se.api.service;
 
 import jbnu.se.api.domain.Election;
+import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.exception.ElectionNotFound;
 import jbnu.se.api.repository.ElectionRepository;
@@ -23,7 +24,7 @@ public class ElectionService {
         Election election = Election.builder()
                 .title(request.getTitle())
                 .period(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()))
-                .electionType(request.getElectionType())
+                .electionType(ElectionType.valueOf(request.getElectionType()))
                 .createdBy(userId)
                 .createdDate(now())
                 .build();
