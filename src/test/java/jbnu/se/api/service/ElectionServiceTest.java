@@ -2,7 +2,7 @@ package jbnu.se.api.service;
 
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.Period;
-import jbnu.se.api.exception.ElectionNotFound;
+import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.response.ElectionResponse;
@@ -109,6 +109,6 @@ class ElectionServiceTest {
 
         // then
         assertThatThrownBy(() -> electionService.findElectionById(id + 1))
-                .isInstanceOf(ElectionNotFound.class);
+                .isInstanceOf(ElectionNotFoundException.class);
     }
 }
