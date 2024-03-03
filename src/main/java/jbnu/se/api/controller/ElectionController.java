@@ -1,7 +1,7 @@
 package jbnu.se.api.controller;
 
-import jbnu.se.api.domain.Election;
 import jbnu.se.api.request.ElectionRequest;
+import jbnu.se.api.response.ElectionResponse;
 import jbnu.se.api.service.ElectionService;
 import jbnu.se.api.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class ElectionController {
     }
 
     @GetMapping("/elections")
-    public List<Election> getAllElections() {
+    public List<ElectionResponse> getAllElections() {
         return electionService.findAllElections();
     }
 }

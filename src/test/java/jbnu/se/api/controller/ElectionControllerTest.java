@@ -8,6 +8,7 @@ import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
+import jbnu.se.api.response.ElectionResponse;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -122,9 +123,10 @@ class ElectionControllerTest {
                 .andReturn();
 
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        List<Election> elections = objectMapper.readValue(contentAsString, new TypeReference<>() {
+        List<ElectionResponse> elections = objectMapper.readValue(contentAsString, new TypeReference<>() {
         });
 
-        assertThat(elections.size()).isEqualTo(electionRepository.count());
+        // then
+        assertThat(elections).hasSize(1);
     }
 }
