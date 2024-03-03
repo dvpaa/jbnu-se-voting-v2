@@ -76,7 +76,7 @@ public class JwtUtils {
     public boolean isValidToken(String token) {
         try {
             final Date expiration = getAllClaimsFromToken(token).getExpiration();
-            return isExpired(expiration);
+            return !isExpired(expiration);
         } catch (InvalidTokenException e) {  // secret or expired
             return false;
         }

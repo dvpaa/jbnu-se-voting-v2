@@ -44,4 +44,4 @@ out/
 /src/main/resources/application-auth.yml
 
 ### test value ###
-/src/test/java/jbnu/se/api/controller/SampleAuthInfo.java
+/src/test/java/jbnu/se/api/config/SampleAuthInfo.java
