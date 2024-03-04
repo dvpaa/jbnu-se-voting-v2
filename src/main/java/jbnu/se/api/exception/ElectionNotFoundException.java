@@ -2,11 +2,11 @@ package jbnu.se.api.exception;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-public class ElectionNotFound extends ApplicationException {
+public class ElectionNotFoundException extends ApplicationException {
 
     private static final String MESSAGE = "존재하지 않는 선거입니다.";
 
-    public ElectionNotFound() {
+    public ElectionNotFoundException() {
         super(MESSAGE);
     }
 

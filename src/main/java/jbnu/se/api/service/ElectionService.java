@@ -3,7 +3,7 @@ package jbnu.se.api.service;
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.domain.Period;
-import jbnu.se.api.exception.ElectionNotFound;
+import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.response.ElectionResponse;
@@ -41,7 +41,7 @@ public class ElectionService {
 
     public ElectionResponse findElectionById(Long id) {
         Election election = electionRepository.findById(id)
-                .orElseThrow(ElectionNotFound::new);
+                .orElseThrow(ElectionNotFoundException::new);
 
         return new ElectionResponse(election);
     }

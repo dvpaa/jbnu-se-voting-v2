@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @PostMapping("/api/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        return loginRequest.getUsername();
+    public void login(@RequestBody LoginRequest loginRequest) {
+        // Spring Security intercepts the request.
     }
 }

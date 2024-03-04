@@ -2,7 +2,7 @@ package jbnu.se.api.service;
 
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.Period;
-import jbnu.se.api.exception.ElectionNotFound;
+import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.response.ElectionResponse;
@@ -41,8 +41,9 @@ class ElectionServiceTest {
         ElectionRequest request = new ElectionRequest();
         request.setTitle("test");
         request.setElectionType(SINGLE.name());
-        LocalDateTime startDate = of(2024, 2, 29, 19, 0);
+        LocalDateTime startDate = of(2100, 1, 1, 0, 0);
         LocalDateTime endDate = startDate.plusDays(1);
+        request.setPeriod(new ElectionRequest.Period());
         request.getPeriod().setStartDate(startDate);
         request.getPeriod().setEndDate(endDate);
 
@@ -63,7 +64,7 @@ class ElectionServiceTest {
         // given
         Election election = Election.builder()
                 .title("test")
-                .period(new Period(of(2024, 3, 2, 0, 0), of(2024, 3, 3, 0, 0)))
+                .period(new Period(of(2100, 1, 1, 0, 0), of(2100, 1, 2, 0, 0)))
                 .electionType(SINGLE)
                 .build();
 
@@ -80,7 +81,7 @@ class ElectionServiceTest {
         // given
         Election election = Election.builder()
                 .title("test")
-                .period(new Period(of(2024, 3, 2, 0, 0), of(2024, 3, 3, 0, 0)))
+                .period(new Period(of(2100, 1, 1, 0, 0), of(2100, 1, 2, 0, 0)))
                 .electionType(SINGLE)
                 .build();
 
@@ -99,7 +100,7 @@ class ElectionServiceTest {
         // given
         Election election = Election.builder()
                 .title("test")
-                .period(new Period(of(2024, 3, 2, 0, 0), of(2024, 3, 3, 0, 0)))
+                .period(new Period(of(2100, 1, 1, 0, 0), of(2100, 1, 2, 0, 0)))
                 .electionType(SINGLE)
                 .build();
 
@@ -109,6 +110,6 @@ class ElectionServiceTest {
 
         // then
         assertThatThrownBy(() -> electionService.findElectionById(id + 1))
-                .isInstanceOf(ElectionNotFound.class);
+                .isInstanceOf(ElectionNotFoundException.class);
     }
 }
