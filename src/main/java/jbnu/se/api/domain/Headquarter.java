@@ -10,7 +10,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Getter
 @Setter
-public class Headquaters extends BaseEntity {
+public class Headquarter extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

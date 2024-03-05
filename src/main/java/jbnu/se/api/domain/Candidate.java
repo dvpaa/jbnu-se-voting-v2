@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static jakarta.persistence.EnumType.STRING;
-import static jakarta.persistence.FetchType.*;
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
@@ -18,8 +18,8 @@ public class Candidate extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "headquaters_id")
-    private Headquaters headquaters;
+    @JoinColumn(name = "headquarter_id")
+    private Headquarter headquarter;
 
     @Embedded
     private Member member;
