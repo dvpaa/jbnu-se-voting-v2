@@ -41,4 +41,8 @@ public class CandidateService {
         candidateRepository.save(president);
         candidateRepository.save(vicePresident);
     }
+
+    public List<Candidate> getCandidatesByHeadquarter(Long id) {
+        return candidateRepository.findAllByHeadquarterId(id);
+    }
 }

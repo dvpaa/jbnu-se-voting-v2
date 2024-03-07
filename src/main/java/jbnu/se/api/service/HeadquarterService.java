@@ -40,4 +40,8 @@ public class HeadquarterService {
                 .name(request.getName())
                 .build();
     }
+
+    public List<Headquarter> getHeadquartersByElection(Long electionId) {
+        return headquarterRepository.findAllByElectionId(electionId);
+    }
 }
