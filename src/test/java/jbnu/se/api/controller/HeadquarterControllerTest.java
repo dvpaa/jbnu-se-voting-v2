@@ -3,12 +3,12 @@ package jbnu.se.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jbnu.se.api.config.JwtAdminRequestPostProcessor;
 import jbnu.se.api.config.JwtUserRequestPostProcessor;
-import jbnu.se.api.domain.Election;
-import jbnu.se.api.domain.ElectionType;
-import jbnu.se.api.domain.Headquarter;
-import jbnu.se.api.domain.Period;
+import jbnu.se.api.domain.*;
+import jbnu.se.api.repository.CandidateRepository;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
+import jbnu.se.api.request.CandidatePair;
+import jbnu.se.api.request.CandidateRequest;
 import jbnu.se.api.request.HeadquarterRequest;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -25,8 +25,10 @@ import java.util.List;
 
 import static java.time.LocalDateTime.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -48,8 +50,12 @@ class HeadquarterControllerTest {
     @Autowired
     private ElectionRepository electionRepository;
 
+    @Autowired
+    private CandidateRepository candidateRepository;
+
     @AfterEach
     void tearDown() {
+        candidateRepository.deleteAll();
         headquarterRepository.deleteAll();
         electionRepository.deleteAll();
     }
@@ -125,5 +131,65 @@ class HeadquarterControllerTest {
 
         assertThat(headquarters).hasSize(2);
         headquarters.forEach(headquarter -> assertThat(headquarter.getElection().getId()).isEqualTo(saved.getId()));
+    }
+
+
+    @Test
+    @DisplayName("선본에 등록된 후보를 가져온다.")
+    void getHeadquartersByElectionTest() throws Exception {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2100, 1, 1, 0, 0),
+                        of(2100, 1, 2, 0, 0)))
+                .electionType(ElectionType.SINGLE)
+                .build();
+
+        Election savedElection = electionRepository.save(election);
+
+
+        Headquarter headquarter = Headquarter.builder()
+                .election(savedElection)
+                .name("test")
+                .build();
+
+        Headquarter savedHeadquarter = headquarterRepository.save(headquarter);
+
+        CandidatePair candidatePairs = CandidatePair.builder()
+                .headquarterId(savedHeadquarter.getId())
+                .president(CandidateRequest.builder()
+                        .studentId("id1")
+                        .name("name1")
+                        .grade(Grade.FRESHMAN.name())
+                        .candidateType(CandidateType.PRESIDENT.name())
+                        .build())
+                .vicePresident(CandidateRequest.builder()
+                        .studentId("id2")
+                        .name("name2")
+                        .grade(Grade.SENIOR.name())
+                        .candidateType(CandidateType.VICE_PRESIDENT.name())
+                        .build())
+                .build();
+
+
+        CandidateRequest presidentInfo = candidatePairs.getPresident();
+        CandidateRequest vicePresidentInfo = candidatePairs.getVicePresident();
+        Candidate president = new Candidate(presidentInfo, savedHeadquarter);
+        Candidate vicePresident = new Candidate(vicePresidentInfo, savedHeadquarter);
+
+        Candidate savedPresident = candidateRepository.save(president);
+        Candidate savedVicePresident = candidateRepository.save(vicePresident);
+
+
+        // expected
+        mockMvc.perform(get("/api/headquarters/{id}", savedHeadquarter.getId())
+                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].electionId").value(savedElection.getId()))
+                .andExpect(jsonPath("$[0].candidatePair.president.id").value(savedPresident.getId()))
+                .andExpect(jsonPath("$[0].candidatePair.vicePresident.id").value(savedVicePresident.getId()))
+                .andDo(print());
+
     }
 }

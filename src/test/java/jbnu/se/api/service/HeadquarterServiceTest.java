@@ -66,4 +66,37 @@ class HeadquarterServiceTest {
         assertThat(headquarterRepository.count()).isEqualTo(2);
         headquarters.forEach(headquarter -> assertThat(headquarter.getElection().getId()).isEqualTo(saved.getId()));
     }
+
+    @Test
+    @DisplayName("선거에 등록된 선본을 찾을 수 있다.")
+    void getHeadquartersByElectionTest() {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2100, 1, 1, 0, 0),
+                        of(2100, 1, 2, 0, 0)))
+                .electionType(ElectionType.SINGLE)
+                .build();
+
+        Election saved = electionRepository.save(election);
+
+        HeadquarterRequest headquarterRequest1 = HeadquarterRequest.builder()
+                .electionId(saved.getId())
+                .name("test1")
+                .build();
+
+        HeadquarterRequest headquarterRequest2 = HeadquarterRequest.builder()
+                .electionId(saved.getId())
+                .name("test2")
+                .build();
+
+        headquarterService.registerHeadquarter(Arrays.asList(headquarterRequest1, headquarterRequest2));
+
+        // when
+        List<Headquarter> headquartersByElection = headquarterService.getHeadquartersByElection(saved.getId());
+
+        // then
+        assertThat(headquartersByElection).hasSize(2);
+        headquartersByElection.forEach(headquarter -> assertThat(headquarter.getElection().getId()).isEqualTo(saved.getId()));
+    }
 }

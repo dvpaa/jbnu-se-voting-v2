@@ -74,4 +74,42 @@ class CandidateServiceTest {
 
         candidates.forEach(candidate -> assertThat(candidate.getHeadquarter().getId()).isEqualTo(saved.getId()));
     }
+
+    @Test
+    @DisplayName("선본에 소속된 후보를 찾을 수 있다.")
+    void getCandidatesByHeadquarterTest() {
+        // given
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .build();
+
+        Headquarter saved = headquarterRepository.save(headquarter);
+
+        List<CandidatePair> candidatePairs = Arrays.asList(
+                CandidatePair.builder()
+                        .headquarterId(saved.getId())
+                        .president(CandidateRequest.builder()
+                                .studentId("id1")
+                                .name("name1")
+                                .grade(Grade.FRESHMAN.name())
+                                .candidateType(CandidateType.PRESIDENT.name())
+                                .build())
+                        .vicePresident(CandidateRequest.builder()
+                                .studentId("id2")
+                                .name("name2")
+                                .grade(Grade.SENIOR.name())
+                                .candidateType(CandidateType.VICE_PRESIDENT.name())
+                                .build())
+                        .build()
+        );
+
+        candidateService.registerCandidate(candidatePairs);
+
+        // when
+        List<Candidate> candidates = candidateService.getCandidatesByHeadquarter(saved.getId());
+
+        // then
+        assertThat(candidates).hasSize(2);
+        candidates.forEach(candidate -> assertThat(candidate.getHeadquarter().getId()).isEqualTo(saved.getId()));
+    }
 }
