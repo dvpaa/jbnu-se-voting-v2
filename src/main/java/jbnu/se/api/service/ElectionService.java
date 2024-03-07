@@ -20,16 +20,9 @@ public class ElectionService {
 
     private final ElectionRepository electionRepository;
 
-    public void registerElection(String userId, ElectionRequest request) {
-        Election election = Election.builder()
-                .title(request.getTitle())
-                .period(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()))
-                .electionType(ElectionType.valueOf(request.getElectionType()))
-                .createdBy(userId)
-                .createdDate(now())
-                .build();
-
-        electionRepository.save(election);
+    public Election registerElection(String userId, ElectionRequest electionRequest) {
+        Election electionFromRequest = makeElectionFromRequest(userId, electionRequest);
+        return electionRepository.save(electionFromRequest);
     }
 
     public List<ElectionResponse> findAllElections() {
@@ -44,5 +37,15 @@ public class ElectionService {
                 .orElseThrow(ElectionNotFoundException::new);
 
         return new ElectionResponse(election);
+    }
+
+    private Election makeElectionFromRequest(String userId, ElectionRequest request) {
+        return Election.builder()
+                .title(request.getTitle())
+                .period(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()))
+                .electionType(ElectionType.valueOf(request.getElectionType()))
+                .createdBy(userId)
+                .createdDate(now())
+                .build();
     }
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jbnu.se.api.annotation.ValidElectionType;
 import jbnu.se.api.validation.ValidationGroups.FirstGroup;
 import jbnu.se.api.validation.ValidationGroups.SecondGroup;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,4 +26,11 @@ public class ElectionRequest {
     @NotNull(message = "선거 종류를 입력해 주세요.", groups = FirstGroup.class)
     @ValidElectionType(message = "유효하지 않은 선거 종류 입니다.", groups = SecondGroup.class)
     private String electionType;
+
+    @Builder
+    public ElectionRequest(String title, PeriodRequest period, String electionType) {
+        this.title = title;
+        this.period = period;
+        this.electionType = electionType;
+    }
 }

@@ -55,7 +55,7 @@ class ElectionControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없으면 에러 반환")
+    @DisplayName("선거 등록은 관리자 권한이 있어야 한다.")
     void roleTest() throws Exception {
         // given
         ElectionRequest electionRequest = new ElectionRequest();
@@ -67,6 +67,7 @@ class ElectionControllerTest {
         electionRequest.getPeriod().setEndDate(endDate);
         electionRequest.setElectionType(SINGLE.name());
 
+        // expected
         mockMvc.perform(post("/api/elections")
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
