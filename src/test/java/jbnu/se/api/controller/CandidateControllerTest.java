@@ -10,6 +10,7 @@ import jbnu.se.api.domain.Headquarter;
 import jbnu.se.api.repository.CandidateRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.CandidatePair;
+import jbnu.se.api.request.CandidatePairRequests;
 import jbnu.se.api.request.CandidateRequest;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -102,29 +104,32 @@ class CandidateControllerTest {
 
         Headquarter saved = headquarterRepository.save(headquarter);
 
-        List<CandidatePair> candidatePairs = Arrays.asList(
-                CandidatePair.builder()
-                        .headquarterId(saved.getId())
-                        .president(CandidateRequest.builder()
-                                .studentId("id1")
-                                .name("name1")
-                                .grade(Grade.FRESHMAN.name())
-                                .candidateType(CandidateType.PRESIDENT.name())
-                                .build())
-                        .vicePresident(CandidateRequest.builder()
-                                .studentId("id2")
-                                .name("name2")
-                                .grade(Grade.SENIOR.name())
-                                .candidateType(CandidateType.VICE_PRESIDENT.name())
-                                .build())
-                        .build()
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .studentId("id1")
+                                        .name("name1")
+                                        .grade(Grade.FRESHMAN.name())
+                                        .candidateType(CandidateType.PRESIDENT.name())
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .studentId("id2")
+                                        .name("name2")
+                                        .grade(Grade.SENIOR.name())
+                                        .candidateType(CandidateType.VICE_PRESIDENT.name())
+                                        .build())
+                                .build()
+                )
         );
 
         // expected
         mockMvc.perform(post("/api/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(candidatePairs))
+                        .content(objectMapper.writeValueAsString(requests))
                 )
                 .andExpect(status().isCreated())
                 .andDo(print());
@@ -135,5 +140,160 @@ class CandidateControllerTest {
         candidates.forEach(candidate -> assertThat(candidate.getHeadquarter().getId()).isEqualTo(saved.getId()));
     }
 
+    @Test
+    @DisplayName("후보 등록 요청시 후보 정보가 존재해야 한다.")
+    void candidateRequestsValidationTest() throws Exception {
+        // given
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .build()
+                )
+        );
+
+        // expected
+        mockMvc.perform(post("/api/candidates")
+                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation['candidates[0].headquarterId']").value("선본 id를 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].president']").value("정후보 정보를 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident']").value("부후보 정보를 입력해 주세요."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("후보 정보에 값들이 존재해야 한다.")
+    void candidateRequestValidationTest() throws Exception {
+        // given
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .build();
+
+        Headquarter saved = headquarterRepository.save(headquarter);
+
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .build())
+                                .build()
+                )
+        );
+
+        // expected
+        mockMvc.perform(post("/api/candidates")
+                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation['candidates[0].president.name']").value("이름을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].president.studentId']").value("학번을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].president.grade']").value("학년을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].president.candidateType']").value("선거 종류를 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.name']").value("이름을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.studentId']").value("학번을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.grade']").value("학년을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value("선거 종류를 입력해 주세요."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 학년은 입력될 수 없다.")
+    void gradeValidationTest() throws Exception {
+        // given
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .build();
+
+        Headquarter saved = headquarterRepository.save(headquarter);
+
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .studentId("id1")
+                                        .name("name1")
+                                        .grade("test1")
+                                        .candidateType(CandidateType.PRESIDENT.name())
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .studentId("id2")
+                                        .name("name2")
+                                        .grade("test2")
+                                        .candidateType(CandidateType.VICE_PRESIDENT.name())
+                                        .build())
+                                .build()
+                )
+        );
+
+        // expected
+        mockMvc.perform(post("/api/candidates")
+                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation['candidates[0].president.grade']").value("유효하지 않은 학년입니다."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.grade']").value("유효하지 않은 학년입니다."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 후보 종류는 입력될 수 없다.")
+    void candidateTypeValidationTest() throws Exception {
+        // given
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .build();
+
+        Headquarter saved = headquarterRepository.save(headquarter);
+
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .studentId("id1")
+                                        .name("name1")
+                                        .grade(Grade.SOPHOMORE.name())
+                                        .candidateType("test1")
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .studentId("id2")
+                                        .name("name2")
+                                        .grade(Grade.SENIOR.name())
+                                        .candidateType("test2")
+                                        .build())
+                                .build()
+                )
+        );
+
+        // expected
+        mockMvc.perform(post("/api/candidates")
+                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation['candidates[0].president.candidateType']").value("유효하지 않은 후보 종류입니다."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value("유효하지 않은 후보 종류입니다."))
+                .andDo(print());
+    }
 
 }
