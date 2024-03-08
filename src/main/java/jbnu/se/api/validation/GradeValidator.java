@@ -2,15 +2,15 @@ package jbnu.se.api.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import jbnu.se.api.annotation.ValidElectionType;
-import jbnu.se.api.domain.ElectionType;
+import jbnu.se.api.annotation.ValidGrade;
+import jbnu.se.api.domain.Grade;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class ElectionTypeValidator implements ConstraintValidator<ValidElectionType, String> {
+public class GradeValidator implements ConstraintValidator<ValidGrade, String> {
 
-    private final List<String> allowedValues = Arrays.stream(ElectionType.values())
+    private final List<String> allowedValues = Arrays.stream(Grade.values())
             .map(Enum::name)
             .toList();
 

@@ -8,6 +8,7 @@ import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
+import jbnu.se.api.request.PeriodRequest;
 import jbnu.se.api.response.ElectionResponse;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -54,18 +55,19 @@ class ElectionControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없으면 에러 반환")
+    @DisplayName("선거 등록은 관리자 권한이 있어야 한다.")
     void roleTest() throws Exception {
         // given
         ElectionRequest electionRequest = new ElectionRequest();
         electionRequest.setTitle("test");
         LocalDateTime startDate = of(2100, 1, 1, 1, 1);
         LocalDateTime endDate = startDate.plusDays(1);
-        electionRequest.setPeriod(new ElectionRequest.Period());
+        electionRequest.setPeriod(new PeriodRequest());
         electionRequest.getPeriod().setStartDate(startDate);
         electionRequest.getPeriod().setEndDate(endDate);
         electionRequest.setElectionType(SINGLE.name());
 
+        // expected
         mockMvc.perform(post("/api/elections")
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
@@ -83,7 +85,7 @@ class ElectionControllerTest {
         electionRequest.setTitle("test");
         LocalDateTime startDate = of(2100, 1, 1, 0, 0);
         LocalDateTime endDate = startDate.plusDays(1);
-        electionRequest.setPeriod(new ElectionRequest.Period());
+        electionRequest.setPeriod(new PeriodRequest());
         electionRequest.getPeriod().setStartDate(startDate);
         electionRequest.getPeriod().setEndDate(endDate);
         electionRequest.setElectionType(SINGLE.name());
@@ -155,7 +157,7 @@ class ElectionControllerTest {
     }
 
     @Test
-    @DisplayName("선거 개설 요청시 선거 종류는 'SINGLE' 또는 'PRIMARY'이어야 한다.")
+    @DisplayName("선거 개설 요청시 선거 종류는 'SINGLE' 또는 'PRIMARY' 이어야 한다.")
     void validElectionTypeTest() throws Exception {
         // given
         String request = "{\"title\":\"test\",\"period\":{\"startDate\": \"2100-01-01T00:00:00\", \"endDate\": \"2100-01-02T00:00:00\"},\"electionType\":\"ERROR\"}";
@@ -179,7 +181,7 @@ class ElectionControllerTest {
         ElectionRequest electionRequest = new ElectionRequest();
         electionRequest.setTitle("test");
         electionRequest.setElectionType("SINGLE");
-        electionRequest.setPeriod(new ElectionRequest.Period());
+        electionRequest.setPeriod(new PeriodRequest());
 
         // expected
         mockMvc.perform(post("/api/elections")
@@ -201,7 +203,7 @@ class ElectionControllerTest {
         ElectionRequest electionRequest = new ElectionRequest();
         electionRequest.setTitle("test");
         electionRequest.setElectionType("SINGLE");
-        electionRequest.setPeriod(new ElectionRequest.Period());
+        electionRequest.setPeriod(new PeriodRequest());
         electionRequest.getPeriod().setStartDate(of(2000, 1, 1, 0, 0, 0));
         electionRequest.getPeriod().setEndDate(of(2000, 1, 2, 0, 0, 0));
 
@@ -225,7 +227,7 @@ class ElectionControllerTest {
         ElectionRequest electionRequest = new ElectionRequest();
         electionRequest.setTitle("test");
         electionRequest.setElectionType("SINGLE");
-        electionRequest.setPeriod(new ElectionRequest.Period());
+        electionRequest.setPeriod(new PeriodRequest());
         electionRequest.getPeriod().setStartDate(of(2100, 2, 1, 0, 0, 0));
         electionRequest.getPeriod().setEndDate(of(2100, 1, 1, 0, 0, 0));
 

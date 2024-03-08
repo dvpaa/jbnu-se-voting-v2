@@ -5,6 +5,7 @@ import jbnu.se.api.domain.Period;
 import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
+import jbnu.se.api.request.PeriodRequest;
 import jbnu.se.api.response.ElectionResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +44,7 @@ class ElectionServiceTest {
         request.setElectionType(SINGLE.name());
         LocalDateTime startDate = of(2100, 1, 1, 0, 0);
         LocalDateTime endDate = startDate.plusDays(1);
-        request.setPeriod(new ElectionRequest.Period());
+        request.setPeriod(new PeriodRequest());
         request.getPeriod().setStartDate(startDate);
         request.getPeriod().setEndDate(endDate);
 

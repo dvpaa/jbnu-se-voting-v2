@@ -1,10 +1,13 @@
 package jbnu.se.api.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.Getter;
 import lombok.Setter;
 
-import static jakarta.persistence.GenerationType.*;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Getter
@@ -16,7 +19,7 @@ public class Pledge extends BaseEntity {
     private Long id;
 
     @Lob
-    private String discription;
+    private String description;
 
     private String posterPath;
 }

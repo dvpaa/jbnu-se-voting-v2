@@ -1,5 +1,6 @@
 package jbnu.se.api.controller;
 
+import jbnu.se.api.domain.Election;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.response.ElectionResponse;
 import jbnu.se.api.service.ElectionService;
@@ -21,9 +22,11 @@ public class ElectionController {
 
     @PostMapping("/elections")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createElection(@Validated(ValidationSequence.class) @RequestBody ElectionRequest electionRequest) {
+    public ElectionResponse createElection(@Validated(ValidationSequence.class) @RequestBody ElectionRequest electionRequest) {
         String userId = SecurityUtils.getUserId();
-        electionService.registerElection(userId, electionRequest);
+        Election election = electionService.registerElection(userId, electionRequest);
+
+        return new ElectionResponse(election);
     }
 
     @GetMapping("/elections")
