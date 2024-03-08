@@ -7,6 +7,7 @@ import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.HeadquarterRequest;
+import jbnu.se.api.request.HeadquarterRequests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class HeadquarterServiceTest {
     @AfterEach
     void tearDown() {
         headquarterRepository.deleteAll();
+        electionRepository.deleteAll();
     }
 
     @Test
@@ -59,8 +61,11 @@ class HeadquarterServiceTest {
                 .name("test2")
                 .build();
 
+        HeadquarterRequests requests = new HeadquarterRequests();
+        requests.setHeadquarters(Arrays.asList(headquarterRequest1, headquarterRequest2));
+
         // when
-        List<Headquarter> headquarters = headquarterService.registerHeadquarter(Arrays.asList(headquarterRequest1, headquarterRequest2));
+        List<Headquarter> headquarters = headquarterService.registerHeadquarter(requests);
 
         // then
         assertThat(headquarterRepository.count()).isEqualTo(2);
@@ -90,7 +95,10 @@ class HeadquarterServiceTest {
                 .name("test2")
                 .build();
 
-        headquarterService.registerHeadquarter(Arrays.asList(headquarterRequest1, headquarterRequest2));
+        HeadquarterRequests requests = new HeadquarterRequests();
+        requests.setHeadquarters(Arrays.asList(headquarterRequest1, headquarterRequest2));
+
+        headquarterService.registerHeadquarter(requests);
 
         // when
         List<Headquarter> headquartersByElection = headquarterService.getHeadquartersByElection(saved.getId());

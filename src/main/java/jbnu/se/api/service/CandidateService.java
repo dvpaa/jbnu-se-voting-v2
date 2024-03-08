@@ -7,6 +7,7 @@ import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.CandidateRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.CandidatePair;
+import jbnu.se.api.request.CandidatePairRequests;
 import jbnu.se.api.request.CandidateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,15 @@ public class CandidateService {
     private final HeadquarterRepository headquarterRepository;
 
     @Transactional
-    public void registerCandidate(List<CandidatePair> candidatePairs) {
-        candidatePairs.forEach(pairs -> {
-            Long headquarterId = pairs.getHeadquarterId();
-            Headquarter headquarter = headquarterRepository.findById(headquarterId)
-                    .orElseThrow(ElectionNotFoundException::new);
+    public void registerCandidate(CandidatePairRequests candidatePairRequests) {
+        candidatePairRequests.getCandidates()
+                .forEach(pairs -> {
+                    Long headquarterId = pairs.getHeadquarterId();
+                    Headquarter headquarter = headquarterRepository.findById(headquarterId)
+                            .orElseThrow(ElectionNotFoundException::new);
 
-            makeAndSaveCandidateFromRequest(pairs, headquarter);
-        });
+                    makeAndSaveCandidateFromRequest(pairs, headquarter);
+                });
     }
 
     private void makeAndSaveCandidateFromRequest(CandidatePair pairs, Headquarter headquarter) {

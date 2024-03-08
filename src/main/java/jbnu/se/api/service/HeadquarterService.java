@@ -7,6 +7,7 @@ import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.HeadquarterRequest;
+import jbnu.se.api.request.HeadquarterRequests;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +22,10 @@ public class HeadquarterService {
     private final ElectionRepository electionRepository;
 
     @Transactional
-    public List<Headquarter> registerHeadquarter(List<HeadquarterRequest> headquarterRequest) {
+    public List<Headquarter> registerHeadquarter(HeadquarterRequests headquarterRequests) {
 
-        return headquarterRequest.stream()
+        return headquarterRequests.getHeadquarters()
+                .stream()
                 .map(request -> {
                     Headquarter headquarterFromRequest = makeHeadquarterFromRequest(request);
                     return headquarterRepository.save(headquarterFromRequest);

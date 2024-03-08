@@ -7,6 +7,7 @@ import jbnu.se.api.domain.Headquarter;
 import jbnu.se.api.repository.CandidateRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.CandidatePair;
+import jbnu.se.api.request.CandidatePairRequests;
 import jbnu.se.api.request.CandidateRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,26 +48,29 @@ class CandidateServiceTest {
 
         Headquarter saved = headquarterRepository.save(headquarter);
 
-        List<CandidatePair> candidatePairs = Arrays.asList(
-                CandidatePair.builder()
-                        .headquarterId(saved.getId())
-                        .president(CandidateRequest.builder()
-                                .studentId("id1")
-                                .name("name1")
-                                .grade(Grade.FRESHMAN.name())
-                                .candidateType(CandidateType.PRESIDENT.name())
-                                .build())
-                        .vicePresident(CandidateRequest.builder()
-                                .studentId("id2")
-                                .name("name2")
-                                .grade(Grade.SENIOR.name())
-                                .candidateType(CandidateType.VICE_PRESIDENT.name())
-                                .build())
-                        .build()
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .studentId("id1")
+                                        .name("name1")
+                                        .grade(Grade.FRESHMAN.name())
+                                        .candidateType(CandidateType.PRESIDENT.name())
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .studentId("id2")
+                                        .name("name2")
+                                        .grade(Grade.SENIOR.name())
+                                        .candidateType(CandidateType.VICE_PRESIDENT.name())
+                                        .build())
+                                .build()
+                )
         );
 
         // when
-        candidateService.registerCandidate(candidatePairs);
+        candidateService.registerCandidate(requests);
 
         // then
         List<Candidate> candidates = candidateRepository.findAll();
@@ -85,25 +89,28 @@ class CandidateServiceTest {
 
         Headquarter saved = headquarterRepository.save(headquarter);
 
-        List<CandidatePair> candidatePairs = Arrays.asList(
-                CandidatePair.builder()
-                        .headquarterId(saved.getId())
-                        .president(CandidateRequest.builder()
-                                .studentId("id1")
-                                .name("name1")
-                                .grade(Grade.FRESHMAN.name())
-                                .candidateType(CandidateType.PRESIDENT.name())
-                                .build())
-                        .vicePresident(CandidateRequest.builder()
-                                .studentId("id2")
-                                .name("name2")
-                                .grade(Grade.SENIOR.name())
-                                .candidateType(CandidateType.VICE_PRESIDENT.name())
-                                .build())
-                        .build()
+        CandidatePairRequests requests = new CandidatePairRequests();
+        requests.setCandidates(
+                Arrays.asList(
+                        CandidatePair.builder()
+                                .headquarterId(saved.getId())
+                                .president(CandidateRequest.builder()
+                                        .studentId("id1")
+                                        .name("name1")
+                                        .grade(Grade.FRESHMAN.name())
+                                        .candidateType(CandidateType.PRESIDENT.name())
+                                        .build())
+                                .vicePresident(CandidateRequest.builder()
+                                        .studentId("id2")
+                                        .name("name2")
+                                        .grade(Grade.SENIOR.name())
+                                        .candidateType(CandidateType.VICE_PRESIDENT.name())
+                                        .build())
+                                .build()
+                )
         );
 
-        candidateService.registerCandidate(candidatePairs);
+        candidateService.registerCandidate(requests);
 
         // when
         List<Candidate> candidates = candidateService.getCandidatesByHeadquarter(saved.getId());
