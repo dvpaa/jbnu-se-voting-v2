@@ -11,7 +11,7 @@ import java.util.List;
 public class ElectionTypeValidator implements ConstraintValidator<ValidElectionType, String> {
 
     private final List<String> allowedValues = Arrays.stream(ElectionType.values())
-            .map((Enum::name))
+            .map(Enum::name)
             .toList();
 
     @Override
