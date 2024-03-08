@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.time.LocalDateTime.now;
-
 @Service
 @RequiredArgsConstructor
 public class ElectionService {
@@ -45,7 +43,6 @@ public class ElectionService {
                 .period(new Period(request.getPeriod().getStartDate(), request.getPeriod().getEndDate()))
                 .electionType(ElectionType.valueOf(request.getElectionType()))
                 .createdBy(userId)
-                .createdDate(now())
                 .build();
     }
 }

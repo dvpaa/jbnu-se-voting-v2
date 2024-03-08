@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -32,11 +30,10 @@ public class Election extends BaseEntity {
     private ElectionType electionType;
 
     @Builder
-    public Election(String title, Period period, ElectionType electionType, String createdBy, LocalDateTime createdDate) {
+    public Election(String title, Period period, ElectionType electionType, String createdBy) {
         this.title = title;
         this.period = period;
         this.electionType = electionType;
         super.setCreatedBy(createdBy);
-        super.setCreatedDate(createdDate);
     }
 }
