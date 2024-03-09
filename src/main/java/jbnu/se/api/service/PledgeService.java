@@ -33,7 +33,7 @@ public class PledgeService {
         pledge.setDescription(pledgeRequest.getDescription());
 
         if (pledgeRequest.getImageFile() != null) {
-            String imagePath = null;
+            String imagePath;
             try {
                 imagePath = googleCloudStorageUtil.uploadFile(pledgeRequest.getImageFile());
             } catch (IOException e) {
