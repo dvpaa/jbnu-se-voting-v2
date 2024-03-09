@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(POST, "/api/elections/**").hasRole("ADMIN")
                         .requestMatchers(POST, "/api/headquarters/**").hasRole("ADMIN")
                         .requestMatchers(POST, "/api/candidates/**").hasRole("ADMIN")
+                        .requestMatchers(POST, "/api/pledges/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
