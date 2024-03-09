@@ -94,11 +94,6 @@ class PledgeControllerTest {
     @Test
     @DisplayName("공약 등록 요청시 선본 id가 있어야 한다..")
     void registerPledgeValidationTest() throws Exception {
-        // given
-        Headquarter headquarter = Headquarter.builder()
-                .name("test")
-                .build();
-
         // expected
         mockMvc.perform(post("/api/admin/pledges")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
