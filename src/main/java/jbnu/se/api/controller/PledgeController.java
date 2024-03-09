@@ -4,6 +4,7 @@ import jbnu.se.api.request.PledgeRequest;
 import jbnu.se.api.service.PledgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,7 +21,7 @@ public class PledgeController {
 
     @PostMapping(value = "/admin/pledges", consumes = {MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerPledge(PledgeRequest pledgeRequest) {
+    public void registerPledge(@Validated PledgeRequest pledgeRequest) {
         pledgeService.createPledge(pledgeRequest);
     }
 }
