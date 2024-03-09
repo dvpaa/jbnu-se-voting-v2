@@ -35,7 +35,7 @@ public class PledgeService {
         if (pledgeRequest.getImageFile() != null) {
             String imagePath = null;
             try {
-                imagePath = googleCloudStorageUtil.saveFile(pledgeRequest.getImageFile());
+                imagePath = googleCloudStorageUtil.uploadFile(pledgeRequest.getImageFile());
             } catch (IOException e) {
                 throw new GCSException(e);
             }

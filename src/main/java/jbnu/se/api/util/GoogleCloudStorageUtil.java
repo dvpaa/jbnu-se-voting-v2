@@ -20,7 +20,7 @@ public class GoogleCloudStorageUtil {
     @Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
 
-    public String saveFile(MultipartFile file) throws IOException {
+    public String uploadFile(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename() + "-" + UUID.randomUUID();
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
