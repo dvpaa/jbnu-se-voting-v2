@@ -85,7 +85,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(candidatePairs))
@@ -126,7 +126,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
@@ -153,7 +153,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
@@ -190,7 +190,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
@@ -240,7 +240,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
@@ -284,7 +284,7 @@ class CandidateControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/candidates")
+        mockMvc.perform(post("/api/admin/candidates")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))

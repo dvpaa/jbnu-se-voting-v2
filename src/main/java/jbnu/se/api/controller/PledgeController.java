@@ -18,7 +18,7 @@ public class PledgeController {
 
     private final PledgeService pledgeService;
 
-    @PostMapping(value = "/pledges", consumes = {MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/admin/pledges", consumes = {MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public void registerPledge(PledgeRequest pledgeRequest) {
         pledgeService.createPledge(pledgeRequest);

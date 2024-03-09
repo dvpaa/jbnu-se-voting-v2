@@ -83,7 +83,7 @@ class HeadquarterControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/headquarters")
+        mockMvc.perform(post("/api/admin/headquarters")
                         .contentType(APPLICATION_JSON)
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .content(objectMapper.writeValueAsString(request))
@@ -120,7 +120,7 @@ class HeadquarterControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/headquarters")
+        mockMvc.perform(post("/api/admin/headquarters")
                         .contentType(APPLICATION_JSON)
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .content(objectMapper.writeValueAsString(request))
@@ -211,7 +211,7 @@ class HeadquarterControllerTest {
         );
 
         // expected
-        mockMvc.perform(post("/api/headquarters")
+        mockMvc.perform(post("/api/admin/headquarters")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))

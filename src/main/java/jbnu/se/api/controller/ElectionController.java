@@ -20,7 +20,7 @@ public class ElectionController {
 
     private final ElectionService electionService;
 
-    @PostMapping("/elections")
+    @PostMapping("/admin/elections")
     @ResponseStatus(HttpStatus.CREATED)
     public ElectionResponse createElection(@Validated(ValidationSequence.class) @RequestBody ElectionRequest electionRequest) {
         String userId = SecurityUtils.getUserId();

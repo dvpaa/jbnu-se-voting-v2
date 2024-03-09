@@ -15,7 +15,7 @@ public class CandidateController {
 
     private final CandidateService candidateService;
 
-    @PostMapping("/candidates")
+    @PostMapping("/admin/candidates")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerCandidate(@Validated(ValidationSequence.class) @RequestBody CandidatePairRequests candidatePairRequests) {
         candidateService.registerCandidate(candidatePairRequests);

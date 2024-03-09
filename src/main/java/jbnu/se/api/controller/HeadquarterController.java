@@ -23,7 +23,7 @@ public class HeadquarterController {
 
     private final CandidateService candidateService;
 
-    @PostMapping("/headquarters")
+    @PostMapping("/admin/headquarters")
     @ResponseStatus(HttpStatus.CREATED)
     public List<HeadquarterResponse> registerHeadquarter(@Validated @RequestBody HeadquarterRequests headquarterRequest) {
         List<Headquarter> headquarters = headquarterService.registerHeadquarter(headquarterRequest);
