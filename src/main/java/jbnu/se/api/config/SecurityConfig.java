@@ -63,9 +63,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(POST, "/api/login").permitAll()
-                        .requestMatchers(POST, "/api/elections/**").hasRole("ADMIN")
-                        .requestMatchers(POST, "/api/headquarters/**").hasRole("ADMIN")
-                        .requestMatchers(POST, "/api/candidates/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer

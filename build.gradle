@@ -30,6 +30,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	implementation 'com.google.cloud:google-cloud-storage:2.35.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -19,5 +19,8 @@ spring:
   profiles:
     active:
       - auth
+    include:
+      - gcs
+
 server:
   port: 8081

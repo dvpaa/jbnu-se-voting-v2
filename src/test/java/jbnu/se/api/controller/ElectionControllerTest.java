@@ -68,7 +68,7 @@ class ElectionControllerTest {
         electionRequest.setElectionType(SINGLE.name());
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest))
@@ -91,7 +91,7 @@ class ElectionControllerTest {
         electionRequest.setElectionType(SINGLE.name());
 
         // when
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest))
@@ -143,7 +143,7 @@ class ElectionControllerTest {
         String json = objectMapper.writeValueAsString(electionRequest);
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(json))
@@ -163,7 +163,7 @@ class ElectionControllerTest {
         String request = "{\"title\":\"test\",\"period\":{\"startDate\": \"2100-01-01T00:00:00\", \"endDate\": \"2100-01-02T00:00:00\"},\"electionType\":\"ERROR\"}";
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(request))
@@ -184,7 +184,7 @@ class ElectionControllerTest {
         electionRequest.setPeriod(new PeriodRequest());
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))
@@ -208,7 +208,7 @@ class ElectionControllerTest {
         electionRequest.getPeriod().setEndDate(of(2000, 1, 2, 0, 0, 0));
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))
@@ -232,7 +232,7 @@ class ElectionControllerTest {
         electionRequest.getPeriod().setEndDate(of(2100, 1, 1, 0, 0, 0));
 
         // expected
-        mockMvc.perform(post("/api/elections")
+        mockMvc.perform(post("/api/admin/elections")
                         .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))

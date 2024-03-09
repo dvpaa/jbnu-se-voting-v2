@@ -42,6 +42,9 @@ out/
 
 ### profile ###
 /src/main/resources/application-auth.yml
+/src/main/resources/application-gcs.yml
 
 ### test value ###
 /src/test/java/jbnu/se/api/config/SampleAuthInfo.java
+
+/src/main/resources/*.json
