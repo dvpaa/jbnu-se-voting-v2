@@ -34,5 +34,10 @@ public class ElectoralRollService {
         electoralRolls.forEach(electoralRoll -> electoralRoll.setElection(election));
 
         electoralRollRepository.saveAll(electoralRolls);
+
+        /**
+         * todo
+         * 1. bulk insert로 교체
+         */
     }
 }
