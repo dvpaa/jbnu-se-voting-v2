@@ -27,4 +27,11 @@ public class ElectoralRoll extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean voted;
+
+    @PrePersist
+    public void prePersist() {
+        if (voted == null) {
+            voted = false;
+        }
+    }
 }
