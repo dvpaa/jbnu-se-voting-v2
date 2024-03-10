@@ -31,7 +31,7 @@ public class ElectoralRollFileHandler {
                 CSVParser csvParser = new CSVParser(reader, CSVFormat.newFormat(',')
                         .builder()
                         .setQuote('"')
-                        .setHeader(STUDENT_COL, NAME_COL)
+                        .setHeader()
                         .setSkipHeaderRecord(true)
                         .setRecordSeparator("\r\n")
                         .setIgnoreEmptyLines(true)
