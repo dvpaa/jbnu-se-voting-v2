@@ -13,12 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,7 +95,7 @@ class PledgeControllerTest {
     }
 
     @Test
-    @DisplayName("공약 등록 요청시 선본 id가 있어야 한다..")
+    @DisplayName("공약 등록 요청시 선본 id가 있어야 한다.")
     void registerPledgeValidationTest() throws Exception {
         // expected
         mockMvc.perform(post("/api/admin/pledges")
@@ -103,6 +106,37 @@ class PledgeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.validation.headquarterId").value("선본 id를 입력해 주세요."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("공약 등록 요청시 이미지는 null 이거나 이미지 파일이어야 한다.")
+    void imageValidationTest() throws Exception {
+        // given
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .build();
+
+        Headquarter savedHeadquarter = headquarterRepository.save(headquarter);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.exe",
+                "exe",
+                (byte[]) null
+        );
+
+        // expected
+        mockMvc.perform(multipart("/api/admin/pledges")
+                        .file("imageFile", file.getBytes())
+                        .param("description", "test")
+                        .param("headquarterId", String.valueOf(savedHeadquarter.getId()))
+                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation.imageFile").value("이미지 파일이 아닙니다."))
                 .andDo(print());
     }
 }
