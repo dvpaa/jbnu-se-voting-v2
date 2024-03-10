@@ -2,8 +2,10 @@ package jbnu.se.api.controller;
 
 import jbnu.se.api.request.ElectoralRollRequest;
 import jbnu.se.api.service.ElectoralRollService;
+import jbnu.se.api.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,7 +22,7 @@ public class ElectoralRollController {
 
     @PostMapping(value = "/admin/electoralRoll", consumes = {MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerElectoralRoll(ElectoralRollRequest electoralRollRequest) {
+    public void registerElectoralRoll(@Validated(ValidationSequence.class) ElectoralRollRequest electoralRollRequest) {
         electoralRollService.registerElectoralRoll(electoralRollRequest);
     }
 }
