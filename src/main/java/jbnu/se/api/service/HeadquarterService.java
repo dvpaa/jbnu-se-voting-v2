@@ -6,8 +6,8 @@ import jbnu.se.api.domain.Headquarter;
 import jbnu.se.api.exception.ElectionNotFoundException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
-import jbnu.se.api.request.HeadquarterRequest;
-import jbnu.se.api.request.HeadquarterRequests;
+import jbnu.se.api.request.HeadquarterCreateRequest;
+import jbnu.se.api.request.HeadquarterCreateRequests;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +22,9 @@ public class HeadquarterService {
     private final ElectionRepository electionRepository;
 
     @Transactional
-    public List<Headquarter> registerHeadquarter(HeadquarterRequests headquarterRequests) {
+    public List<Headquarter> registerHeadquarter(HeadquarterCreateRequests headquarterCreateRequests) {
 
-        return headquarterRequests.getHeadquarters()
+        return headquarterCreateRequests.getHeadquarters()
                 .stream()
                 .map(request -> {
                     Headquarter headquarterFromRequest = makeHeadquarterFromRequest(request);
@@ -33,13 +33,14 @@ public class HeadquarterService {
                 .toList();
     }
 
-    private Headquarter makeHeadquarterFromRequest(HeadquarterRequest request) {
+    private Headquarter makeHeadquarterFromRequest(HeadquarterCreateRequest request) {
         Election election = electionRepository.findById(request.getElectionId())
                 .orElseThrow(ElectionNotFoundException::new);
 
         return Headquarter.builder()
                 .election(election)
                 .name(request.getName())
+                .symbol(request.getSymbol())
                 .build();
     }
 

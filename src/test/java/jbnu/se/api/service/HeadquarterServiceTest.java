@@ -6,8 +6,8 @@ import jbnu.se.api.domain.Headquarter;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
-import jbnu.se.api.request.HeadquarterRequest;
-import jbnu.se.api.request.HeadquarterRequests;
+import jbnu.se.api.request.HeadquarterCreateRequest;
+import jbnu.se.api.request.HeadquarterCreateRequests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,23 +46,25 @@ class HeadquarterServiceTest {
                 .title("test")
                 .period(new Period(of(2100, 1, 1, 0, 0),
                         of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.SINGLE)
+                .electionType(ElectionType.PRIMARY)
                 .build();
 
         Election saved = electionRepository.save(election);
 
-        HeadquarterRequest headquarterRequest1 = HeadquarterRequest.builder()
+        HeadquarterCreateRequest headquarterCreateRequest1 = HeadquarterCreateRequest.builder()
                 .electionId(saved.getId())
                 .name("test1")
+                .symbol("1")
                 .build();
 
-        HeadquarterRequest headquarterRequest2 = HeadquarterRequest.builder()
+        HeadquarterCreateRequest headquarterCreateRequest2 = HeadquarterCreateRequest.builder()
                 .electionId(saved.getId())
                 .name("test2")
+                .symbol("2")
                 .build();
 
-        HeadquarterRequests requests = new HeadquarterRequests();
-        requests.setHeadquarters(Arrays.asList(headquarterRequest1, headquarterRequest2));
+        HeadquarterCreateRequests requests = new HeadquarterCreateRequests();
+        requests.setHeadquarters(Arrays.asList(headquarterCreateRequest1, headquarterCreateRequest2));
 
         // when
         List<Headquarter> headquarters = headquarterService.registerHeadquarter(requests);
@@ -80,23 +82,25 @@ class HeadquarterServiceTest {
                 .title("test")
                 .period(new Period(of(2100, 1, 1, 0, 0),
                         of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.SINGLE)
+                .electionType(ElectionType.PRIMARY)
                 .build();
 
         Election saved = electionRepository.save(election);
 
-        HeadquarterRequest headquarterRequest1 = HeadquarterRequest.builder()
+        HeadquarterCreateRequest headquarterCreateRequest1 = HeadquarterCreateRequest.builder()
                 .electionId(saved.getId())
                 .name("test1")
+                .symbol("1")
                 .build();
 
-        HeadquarterRequest headquarterRequest2 = HeadquarterRequest.builder()
+        HeadquarterCreateRequest headquarterCreateRequest2 = HeadquarterCreateRequest.builder()
                 .electionId(saved.getId())
                 .name("test2")
+                .symbol("2")
                 .build();
 
-        HeadquarterRequests requests = new HeadquarterRequests();
-        requests.setHeadquarters(Arrays.asList(headquarterRequest1, headquarterRequest2));
+        HeadquarterCreateRequests requests = new HeadquarterCreateRequests();
+        requests.setHeadquarters(Arrays.asList(headquarterCreateRequest1, headquarterCreateRequest2));
 
         headquarterService.registerHeadquarter(requests);
 

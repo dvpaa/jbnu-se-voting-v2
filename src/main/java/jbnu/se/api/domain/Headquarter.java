@@ -30,9 +30,13 @@ public class Headquarter extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String symbol;
+
     @Builder
-    public Headquarter(Election election, String name) {
+    public Headquarter(Election election, String name, String symbol) {
         this.election = election;
         this.name = name;
+        this.symbol = symbol;
     }
 }
