@@ -9,8 +9,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class HeadquarterRequests {
+public class HeadquarterCreateRequests {
 
     @NotEmpty(message = "요청데이터가 존재하지 않습니다.")
-    private List<@Valid HeadquarterRequest> headquarters;
+    private List<@Valid HeadquarterCreateRequest> headquarters;
 }

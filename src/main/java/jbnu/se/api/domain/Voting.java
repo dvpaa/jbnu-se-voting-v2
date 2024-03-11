@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -13,7 +16,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Headquarter extends BaseEntity {
+public class Voting {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -23,20 +26,20 @@ public class Headquarter extends BaseEntity {
     @JoinColumn(name = "election_id")
     private Election election;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "pledge_id")
-    private Pledge pledge;
+    /**
+     * 단선인 경우 "찬성", "반대", "기권, 무효"
+     * 경선인 경우 기호
+     */
+    @Column(nullable = false, updatable = false)
+    private String result;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String symbol;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
 
     @Builder
-    public Headquarter(Election election, String name, String symbol) {
+    public Voting(Election election, String result) {
         this.election = election;
-        this.name = name;
-        this.symbol = symbol;
+        this.result = result;
     }
 }

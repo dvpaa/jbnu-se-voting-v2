@@ -62,6 +62,7 @@ class CandidateControllerTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter saved = headquarterRepository.save(headquarter);
@@ -100,6 +101,7 @@ class CandidateControllerTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter saved = headquarterRepository.save(headquarter);
@@ -172,6 +174,7 @@ class CandidateControllerTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter saved = headquarterRepository.save(headquarter);
@@ -214,6 +217,7 @@ class CandidateControllerTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter saved = headquarterRepository.save(headquarter);
@@ -258,6 +262,7 @@ class CandidateControllerTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter saved = headquarterRepository.save(headquarter);

@@ -39,6 +39,7 @@ class PledgeServiceTest {
         // given
         Headquarter headquarter = Headquarter.builder()
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter savedHeadquarter = headquarterRepository.save(headquarter);

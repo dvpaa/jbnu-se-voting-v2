@@ -3,7 +3,7 @@ package jbnu.se.api.controller;
 import jbnu.se.api.domain.Candidate;
 import jbnu.se.api.domain.Headquarter;
 import jbnu.se.api.request.ElectionIdRequest;
-import jbnu.se.api.request.HeadquarterRequests;
+import jbnu.se.api.request.HeadquarterCreateRequests;
 import jbnu.se.api.response.HeadquarterResponse;
 import jbnu.se.api.service.CandidateService;
 import jbnu.se.api.service.HeadquarterService;
@@ -25,7 +25,7 @@ public class HeadquarterController {
 
     @PostMapping("/admin/headquarters")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<HeadquarterResponse> registerHeadquarter(@Validated @RequestBody HeadquarterRequests headquarterRequest) {
+    public List<HeadquarterResponse> registerHeadquarter(@Validated @RequestBody HeadquarterCreateRequests headquarterRequest) {
         List<Headquarter> headquarters = headquarterService.registerHeadquarter(headquarterRequest);
         return headquarters.stream()
                 .map(HeadquarterResponse::new)

@@ -71,12 +71,12 @@ class HeadquarterControllerTest {
 
         Election saved = electionRepository.save(election);
 
-        List<HeadquarterRequest> request = Arrays.asList(
-                HeadquarterRequest.builder()
+        List<HeadquarterCreateRequest> request = Arrays.asList(
+                HeadquarterCreateRequest.builder()
                         .electionId(saved.getId())
                         .name("test1")
                         .build(),
-                HeadquarterRequest.builder()
+                HeadquarterCreateRequest.builder()
                         .electionId(saved.getId())
                         .name("test2")
                         .build()
@@ -100,21 +100,23 @@ class HeadquarterControllerTest {
                 .title("test")
                 .period(new Period(of(2100, 1, 1, 0, 0),
                         of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.SINGLE)
+                .electionType(ElectionType.PRIMARY)
                 .build();
 
         Election saved = electionRepository.save(election);
 
-        HeadquarterRequests request = new HeadquarterRequests();
+        HeadquarterCreateRequests request = new HeadquarterCreateRequests();
         request.setHeadquarters(
                 Arrays.asList(
-                        HeadquarterRequest.builder()
+                        HeadquarterCreateRequest.builder()
                                 .electionId(saved.getId())
                                 .name("test1")
+                                .symbol("1")
                                 .build(),
-                        HeadquarterRequest.builder()
+                        HeadquarterCreateRequest.builder()
                                 .electionId(saved.getId())
                                 .name("test2")
+                                .symbol("2")
                                 .build()
                 )
         );
@@ -153,6 +155,7 @@ class HeadquarterControllerTest {
         Headquarter headquarter = Headquarter.builder()
                 .election(savedElection)
                 .name("test")
+                .symbol("1")
                 .build();
 
         Headquarter savedHeadquarter = headquarterRepository.save(headquarter);
@@ -202,10 +205,10 @@ class HeadquarterControllerTest {
     @DisplayName("선본 등록 요청시 값이 존재해야 한다.")
     void headquarterRequestValidationTest() throws Exception {
         // given
-        HeadquarterRequests request = new HeadquarterRequests();
+        HeadquarterCreateRequests request = new HeadquarterCreateRequests();
         request.setHeadquarters(
                 Arrays.asList(
-                        HeadquarterRequest.builder()
+                        HeadquarterCreateRequest.builder()
                                 .build()
                 )
         );
@@ -219,6 +222,7 @@ class HeadquarterControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.validation['headquarters[0].electionId']").value("선거 id를 입력해 주세요."))
                 .andExpect(jsonPath("$.validation['headquarters[0].name']").value("선본 이름을 입력해 주세요."))
+                .andExpect(jsonPath("$.validation['headquarters[0].symbol']").value("기호를 입력해 주세요."))
                 .andDo(print());
     }
 }
