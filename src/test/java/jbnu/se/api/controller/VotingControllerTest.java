@@ -463,4 +463,45 @@ class VotingControllerTest {
                 .andExpect(jsonPath("$.message").value("이미 투표를 하였습니다."))
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("요청 데이터 검증")
+    void requestValidation() throws Exception {
+        // given
+        VotingRequest votingRequest = new VotingRequest();
+
+        // expected
+        mockMvc.perform(post("/api/voting")
+                        .contentType(APPLICATION_JSON)
+                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .content(objectMapper.writeValueAsString(votingRequest))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation.electionId").value("선거 id를 입력해 주세요."))
+                .andExpect(jsonPath("$.validation.electionType").value("선거 종류를 입력해 주세요."))
+                .andExpect(jsonPath("$.validation.result").value("선거 결과를 입력해 주세요."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("요청 데이터의 선거 종류 검증")
+    void electionTypeValidation() throws Exception {
+        // given
+        VotingRequest votingRequest = new VotingRequest();
+        votingRequest.setElectionId(1L);
+        votingRequest.setElectionType("test");
+        votingRequest.setResult("1");
+
+        // expected
+        mockMvc.perform(post("/api/voting")
+                        .contentType(APPLICATION_JSON)
+                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .content(objectMapper.writeValueAsString(votingRequest))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.validation.electionType").value("유효하지 않은 선거 종류입니다."))
+                .andDo(print());
+    }
 }
