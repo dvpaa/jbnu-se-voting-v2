@@ -1,5 +1,6 @@
 package jbnu.se.api.util;
 
+import jbnu.se.api.exception.InvalidElectionTypeException;
 import jbnu.se.api.service.VotingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,6 @@ public class VotingServiceFinder {
         return votingServices.stream()
                 .filter(votingService -> votingService.supports(type))
                 .findAny()
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(InvalidElectionTypeException::new);
     }
 }

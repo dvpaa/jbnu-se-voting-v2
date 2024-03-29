@@ -2,6 +2,8 @@ package jbnu.se.api.controller;
 
 import jbnu.se.api.domain.Member;
 import jbnu.se.api.request.VotingRequest;
+import jbnu.se.api.request.VotingResultRequest;
+import jbnu.se.api.response.VotingResultResponse;
 import jbnu.se.api.service.VotingService;
 import jbnu.se.api.util.SecurityUtils;
 import jbnu.se.api.util.VotingServiceFinder;
@@ -25,5 +27,11 @@ public class VotingController {
 
         VotingService votingService = votingServiceFinder.find(votingRequest.getElectionType());
         votingService.vote(member, votingRequest);
+    }
+
+    @GetMapping("/voting/count")
+    public VotingResultResponse getVotingResult(@RequestBody VotingResultRequest votingResultRequest) {
+        VotingService votingService = votingServiceFinder.find(votingResultRequest.getElectionType());
+        return votingService.getVotingResult(votingResultRequest);
     }
 }

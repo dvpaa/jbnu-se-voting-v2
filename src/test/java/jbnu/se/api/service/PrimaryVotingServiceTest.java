@@ -9,6 +9,9 @@ import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.repository.VotingRepository;
 import jbnu.se.api.request.VotingRequest;
+import jbnu.se.api.request.VotingResultRequest;
+import jbnu.se.api.response.HeadquarterResult;
+import jbnu.se.api.response.PrimaryVotingResultResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -239,5 +242,66 @@ class PrimaryVotingServiceTest {
 
         // then
         assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(AlreadyVotedException.class);
+    }
+
+    @Test
+    @DisplayName("결선 개표")
+    void primaryVoteCountTest() {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2100, 1, 1, 0, 0),
+                        of(2100, 1, 2, 0, 0)))
+                .electionType(ElectionType.PRIMARY)
+                .build();
+
+        Election savedElection = electionRepository.save(election);
+
+        Headquarter headquarter1 = Headquarter.builder()
+                .name("test1")
+                .election(savedElection)
+                .symbol("1")
+                .build();
+
+        Headquarter headquarter2 = Headquarter.builder()
+                .name("test2")
+                .election(savedElection)
+                .symbol("2")
+                .build();
+
+        headquarterRepository.save(headquarter1);
+        headquarterRepository.save(headquarter2);
+
+        Member voter = new Member("id", "name");
+
+        ElectoralRoll electoralRoll = new ElectoralRoll();
+        electoralRoll.setElection(election);
+        electoralRoll.setMember(voter);
+
+        electoralRollRepository.save(electoralRoll);
+
+        Voting voting = Voting.builder()
+                .election(savedElection)
+                .result("1")
+                .build();
+
+        votingRepository.save(voting);
+
+        // when
+        VotingResultRequest votingResultRequest = new VotingResultRequest();
+        votingResultRequest.setElectionType("PRIMARY");
+        votingResultRequest.setElectionId(savedElection.getId());
+
+        PrimaryVotingResultResponse votingResult = (PrimaryVotingResultResponse) primaryVotingService.getVotingResult(votingResultRequest);
+
+        // then
+        assertThat(votingResult.getVoterCount()).isEqualTo(1);
+        assertThat(votingResult.getVoidCount()).isZero();
+
+        List<HeadquarterResult> headquarterResults = votingResult.getHeadquarterResults();
+        assertThat(headquarterResults).hasSize(2);
+
+        assertThat(headquarterResults.get(0).getCount()).isEqualTo(1);
+        assertThat(headquarterResults.get(1).getCount()).isZero();
     }
 }

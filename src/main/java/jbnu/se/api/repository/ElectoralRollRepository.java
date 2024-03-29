@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ElectoralRollRepository extends JpaRepository<ElectoralRoll, Long> {
     Optional<ElectoralRoll> findByElectionIdAndMember(Long electionId, Member member);
+
+    Long countByElectionId(Long electionId);
 }
