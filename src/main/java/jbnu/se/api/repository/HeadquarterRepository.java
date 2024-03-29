@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface HeadquarterRepository extends JpaRepository<Headquarter, Long> {
     List<Headquarter> findAllByElectionId(Long id);
+
+    List<Headquarter> findAllByElectionIdOrderBySymbol(Long id);
 }

@@ -8,6 +8,7 @@ import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.repository.VotingRepository;
 import jbnu.se.api.request.VotingRequest;
+import jbnu.se.api.request.VotingResultRequest;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +25,7 @@ import static jbnu.se.api.config.SampleAuthInfo.USER_ID;
 import static jbnu.se.api.config.SampleAuthInfo.USER_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -502,6 +504,120 @@ class VotingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.validation.electionType").value("유효하지 않은 선거 종류입니다."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("단선-투표 결과 조회")
+    void singleVoteResultTest() throws Exception {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2100, 1, 1, 0, 0),
+                        of(2100, 1, 2, 0, 0)))
+                .electionType(ElectionType.SINGLE)
+                .build();
+
+        Election savedElection = electionRepository.save(election);
+
+        Headquarter headquarter = Headquarter.builder()
+                .name("test")
+                .election(savedElection)
+                .symbol("1")
+                .build();
+
+        headquarterRepository.save(headquarter);
+
+        Member voter = new Member(USER_ID, USER_NAME);
+
+        ElectoralRoll electoralRoll = new ElectoralRoll();
+        electoralRoll.setElection(election);
+        electoralRoll.setMember(voter);
+
+        electoralRollRepository.save(electoralRoll);
+
+        Voting voting = new Voting();
+        voting.setElection(savedElection);
+        voting.setResult("agree");
+
+        votingRepository.save(voting);
+
+        VotingResultRequest votingResultRequest = new VotingResultRequest();
+        votingResultRequest.setElectionId(savedElection.getId());
+        votingResultRequest.setElectionType(savedElection.getElectionType().name());
+
+        // expected
+        mockMvc.perform(get("/api/voting/count")
+                        .contentType(APPLICATION_JSON)
+                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .content(objectMapper.writeValueAsString(votingResultRequest))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.voterCount").value(1))
+                .andExpect(jsonPath("$.agreeCount").value(1))
+                .andExpect(jsonPath("$.disagreeCount").value(0))
+                .andExpect(jsonPath("$.voidCount").value(0))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("결선-투표 결과 조회")
+    void primaryVoteResultTest() throws Exception {
+        // given
+        Election election = Election.builder()
+                .title("test")
+                .period(new Period(of(2100, 1, 1, 0, 0),
+                        of(2100, 1, 2, 0, 0)))
+                .electionType(ElectionType.PRIMARY)
+                .build();
+
+        Election savedElection = electionRepository.save(election);
+
+        Headquarter headquarter1 = Headquarter.builder()
+                .name("test1")
+                .election(savedElection)
+                .symbol("1")
+                .build();
+
+        Headquarter headquarter2 = Headquarter.builder()
+                .name("test2")
+                .election(savedElection)
+                .symbol("2")
+                .build();
+
+        headquarterRepository.save(headquarter1);
+        headquarterRepository.save(headquarter2);
+
+        Member voter = new Member(USER_ID, USER_NAME);
+
+        ElectoralRoll electoralRoll = new ElectoralRoll();
+        electoralRoll.setElection(election);
+        electoralRoll.setMember(voter);
+
+        electoralRollRepository.save(electoralRoll);
+
+        Voting voting = Voting.builder()
+                .election(savedElection)
+                .result("1")
+                .build();
+
+        votingRepository.save(voting);
+
+        VotingResultRequest votingResultRequest = new VotingResultRequest();
+        votingResultRequest.setElectionId(savedElection.getId());
+        votingResultRequest.setElectionType("PRIMARY");
+
+        // expected
+        mockMvc.perform(get("/api/voting/count")
+                        .contentType(APPLICATION_JSON)
+                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .content(objectMapper.writeValueAsString(votingResultRequest))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.voterCount").value(1))
+                .andExpect(jsonPath("$.voidCount").value(0))
+                .andExpect(jsonPath("$.headquarterResults[0].count").value(1))
+                .andExpect(jsonPath("$.headquarterResults[1].count").value(0))
                 .andDo(print());
     }
 }
