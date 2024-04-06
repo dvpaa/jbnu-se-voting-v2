@@ -9,18 +9,18 @@ import java.util.Objects;
 
 public class OasisAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final Object principal;
+    private final String principal;
 
-    private Object credentials;
+    private String credentials;
 
-    public OasisAuthenticationToken(Object principal, Object credentials) {
+    public OasisAuthenticationToken(String principal, String credentials) {
         super(null);
         this.principal = principal;
         this.credentials = credentials;
         this.setAuthenticated(false);
     }
 
-    public OasisAuthenticationToken(Object principal, Object credentials, Object details, Collection<? extends GrantedAuthority> authorities) {
+    public OasisAuthenticationToken(String principal, String credentials, Object details, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
@@ -28,21 +28,21 @@ public class OasisAuthenticationToken extends AbstractAuthenticationToken {
         super.setAuthenticated(true);
     }
 
-    public static OasisAuthenticationToken unauthenticated(Object principal, Object credentials) {
+    public static OasisAuthenticationToken unauthenticated(String principal, String credentials) {
         return new OasisAuthenticationToken(principal, credentials);
     }
 
-    public static OasisAuthenticationToken authenticated(Object principal, Object credentials, Object details, Collection<? extends GrantedAuthority> authorities) {
+    public static OasisAuthenticationToken authenticated(String principal, String credentials, Object details, Collection<? extends GrantedAuthority> authorities) {
         return new OasisAuthenticationToken(principal, credentials, details, authorities);
     }
 
     @Override
-    public Object getPrincipal() {
+    public String getPrincipal() {
         return principal;
     }
 
     @Override
-    public Object getCredentials() {
+    public String getCredentials() {
         return credentials;
     }
 
