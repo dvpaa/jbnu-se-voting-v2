@@ -10,10 +10,10 @@ import lombok.Setter;
 public class OasisApiRequest {
 
     @JsonProperty("rType")
-    private final String rType = "3tier";
+    private static final String rType = "3tier";
 
     @JsonProperty("loginType")
-    private final String loginType = "3tier";
+    private static final String loginType = "3tier";
 
     @JsonProperty("userNo")
     private String userNo;
@@ -22,7 +22,7 @@ public class OasisApiRequest {
     private String userPwd;
 
     @JsonProperty("loginGubun")
-    private final String loginGubun = "0";
+    private static final String loginGubun = "0";
 
 
     @Builder
