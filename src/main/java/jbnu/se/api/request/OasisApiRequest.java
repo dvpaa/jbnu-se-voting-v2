@@ -3,31 +3,31 @@ package jbnu.se.api.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class OasisApiRequest {
 
     @JsonProperty("rType")
-    private static final String rType = "3tier";
+    private final String rType;
 
     @JsonProperty("loginType")
-    private static final String loginType = "3tier";
+    private final String loginType;
 
     @JsonProperty("userNo")
-    private String userNo;
+    private final String userNo;
 
     @JsonProperty("userPwd")
-    private String userPwd;
+    private final String userPwd;
 
     @JsonProperty("loginGubun")
-    private static final String loginGubun = "0";
-
+    private final String loginGubun;
 
     @Builder
     public OasisApiRequest(String userNo, String userPwd) {
+        this.rType = "3tier";
+        this.loginType = "3tier";
         this.userNo = userNo;
         this.userPwd = userPwd;
+        this.loginGubun = "0";
     }
 }
