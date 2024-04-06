@@ -9,7 +9,6 @@ import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.request.PeriodRequest;
-import jbnu.se.api.response.ElectionResponse;
 import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static java.time.LocalDateTime.of;
 import static jbnu.se.api.domain.ElectionType.SINGLE;
@@ -128,7 +128,7 @@ class ElectionControllerTest {
                 .andReturn();
 
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        List<ElectionResponse> elections = objectMapper.readValue(contentAsString, new TypeReference<>() {
+        List<Map<String, String>> elections = objectMapper.readValue(contentAsString, new TypeReference<>() {
         });
 
         // then
