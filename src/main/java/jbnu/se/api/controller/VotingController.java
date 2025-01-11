@@ -11,7 +11,12 @@ import jbnu.se.api.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
@@ -25,13 +30,13 @@ public class VotingController {
     public void vote(@Validated(ValidationSequence.class) @RequestBody VotingRequest votingRequest) {
         Member member = new Member(SecurityUtils.getUserId(), SecurityUtils.getUsername());
 
-        VotingService votingService = votingServiceFinder.find(votingRequest.getElectionType());
+        VotingService votingService = votingServiceFinder.find(votingRequest.getElectionId());
         votingService.vote(member, votingRequest);
     }
 
     @GetMapping("/voting/count")
     public VotingResultResponse getVotingResult(@RequestBody VotingResultRequest votingResultRequest) {
-        VotingService votingService = votingServiceFinder.find(votingResultRequest.getElectionType());
+        VotingService votingService = votingServiceFinder.find(votingResultRequest.getElectionId());
         return votingService.getVotingResult(votingResultRequest);
     }
 }

@@ -1,5 +1,8 @@
 package jbnu.se.api.service;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.exception.ElectionNotFoundException;
@@ -14,22 +17,20 @@ import jbnu.se.api.response.SingleVotingResultResponse;
 import jbnu.se.api.response.VotingResultResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 @Service
 public class SingleVotingService extends AbstractVotingService {
 
     private static final Set<String> RESULT_SET = new HashSet<>(Arrays.asList("agree", "disagree", "void"));
 
-    public SingleVotingService(VotingRepository votingRepository, ElectionRepository electionRepository, ElectoralRollRepository electoralRollRepository, HeadquarterRepository headquarterRepository) {
+    public SingleVotingService(VotingRepository votingRepository, ElectionRepository electionRepository,
+                               ElectoralRollRepository electoralRollRepository,
+                               HeadquarterRepository headquarterRepository) {
         super(votingRepository, electionRepository, electoralRollRepository, headquarterRepository);
     }
 
     @Override
-    public boolean supports(String type) {
-        return ElectionType.SINGLE.name().equals(type);
+    public boolean supports(ElectionType type) {
+        return ElectionType.SINGLE.equals(type);
     }
 
     @Override
@@ -48,7 +49,8 @@ public class SingleVotingService extends AbstractVotingService {
 
         Long voterCount = electoralRollRepository.countByElectionId(votingResultRequest.getElectionId());
         Long agreeCount = votingRepository.countByElectionIdAndResult(votingResultRequest.getElectionId(), "agree");
-        Long disagreeCount = votingRepository.countByElectionIdAndResult(votingResultRequest.getElectionId(), "disagree");
+        Long disagreeCount = votingRepository.countByElectionIdAndResult(votingResultRequest.getElectionId(),
+                "disagree");
         Long voidCount = votingRepository.countByElectionIdAndResult(votingResultRequest.getElectionId(), "void");
 
         return SingleVotingResultResponse.builder()

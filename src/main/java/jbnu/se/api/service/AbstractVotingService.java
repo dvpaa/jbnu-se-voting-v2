@@ -5,7 +5,10 @@ import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectoralRoll;
 import jbnu.se.api.domain.Member;
 import jbnu.se.api.domain.Voting;
-import jbnu.se.api.exception.*;
+import jbnu.se.api.exception.AlreadyVotedException;
+import jbnu.se.api.exception.ElectionNotFoundException;
+import jbnu.se.api.exception.ElectoralRollNotFoundException;
+import jbnu.se.api.exception.InvalidVotingResultException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
@@ -30,10 +33,6 @@ public abstract class AbstractVotingService implements VotingService {
         Election election = electionRepository.findById(votingRequest.getElectionId())
                 .orElseThrow(ElectionNotFoundException::new);
 
-        if (isElectionTypeMatched(votingRequest, election)) {
-            throw new UnmatchedElectionTypeException();
-        }
-
         if (!validResult(votingRequest)) {
             throw new InvalidVotingResultException();
         }
@@ -57,9 +56,5 @@ public abstract class AbstractVotingService implements VotingService {
 
     private boolean isAlreadyVoted(ElectoralRoll electoralRoll) {
         return Boolean.TRUE.equals(electoralRoll.getVoted());
-    }
-
-    private boolean isElectionTypeMatched(VotingRequest votingRequest, Election election) {
-        return !election.getElectionType().name().equals(votingRequest.getElectionType());
     }
 }

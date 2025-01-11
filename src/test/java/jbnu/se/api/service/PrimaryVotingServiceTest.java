@@ -1,9 +1,19 @@
 package jbnu.se.api.service;
 
-import jbnu.se.api.domain.*;
+import static java.time.LocalDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.List;
+import jbnu.se.api.domain.Election;
+import jbnu.se.api.domain.ElectionType;
+import jbnu.se.api.domain.ElectoralRoll;
+import jbnu.se.api.domain.Headquarter;
+import jbnu.se.api.domain.Member;
+import jbnu.se.api.domain.Period;
+import jbnu.se.api.domain.Voting;
 import jbnu.se.api.exception.AlreadyVotedException;
 import jbnu.se.api.exception.InvalidVotingResultException;
-import jbnu.se.api.exception.UnmatchedElectionTypeException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
@@ -17,12 +27,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static java.time.LocalDateTime.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class PrimaryVotingServiceTest {
@@ -90,7 +94,6 @@ class PrimaryVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("1");
-        votingRequest.setElectionType("PRIMARY");
 
         primaryVotingService.vote(voter, votingRequest);
 
@@ -145,56 +148,10 @@ class PrimaryVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("3");
-        votingRequest.setElectionType("PRIMARY");
 
         // then
-        assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(InvalidVotingResultException.class);
-    }
-
-    @Test
-    @DisplayName("선거 종류가 맞지 않으면 오류")
-    void singleElectionTypeValidationTest() {
-        // given
-        Election election = Election.builder()
-                .title("test")
-                .period(new Period(of(2100, 1, 1, 0, 0),
-                        of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.PRIMARY)
-                .build();
-
-        Election savedElection = electionRepository.save(election);
-
-        Headquarter headquarter1 = Headquarter.builder()
-                .name("test1")
-                .election(savedElection)
-                .symbol("1")
-                .build();
-
-        Headquarter headquarter2 = Headquarter.builder()
-                .name("test2")
-                .election(savedElection)
-                .symbol("2")
-                .build();
-
-        headquarterRepository.save(headquarter1);
-        headquarterRepository.save(headquarter2);
-
-        Member voter = new Member("id", "name");
-
-        ElectoralRoll electoralRoll = new ElectoralRoll();
-        electoralRoll.setElection(election);
-        electoralRoll.setMember(voter);
-
-        electoralRollRepository.save(electoralRoll);
-
-        // when
-        VotingRequest votingRequest = new VotingRequest();
-        votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setResult("agree");
-        votingRequest.setElectionType("SINGLE");
-
-        // then
-        assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(UnmatchedElectionTypeException.class);
+        assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(
+                InvalidVotingResultException.class);
     }
 
     @Test
@@ -238,10 +195,10 @@ class PrimaryVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("1");
-        votingRequest.setElectionType("PRIMARY");
 
         // then
-        assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(AlreadyVotedException.class);
+        assertThatThrownBy(() -> primaryVotingService.vote(voter, votingRequest)).isInstanceOf(
+                AlreadyVotedException.class);
     }
 
     @Test
@@ -292,7 +249,8 @@ class PrimaryVotingServiceTest {
         votingResultRequest.setElectionType("PRIMARY");
         votingResultRequest.setElectionId(savedElection.getId());
 
-        PrimaryVotingResultResponse votingResult = (PrimaryVotingResultResponse) primaryVotingService.getVotingResult(votingResultRequest);
+        PrimaryVotingResultResponse votingResult = (PrimaryVotingResultResponse) primaryVotingService.getVotingResult(
+                votingResultRequest);
 
         // then
         assertThat(votingResult.getVoterCount()).isEqualTo(1);

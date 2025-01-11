@@ -1,9 +1,19 @@
 package jbnu.se.api.service;
 
-import jbnu.se.api.domain.*;
+import static java.time.LocalDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.List;
+import jbnu.se.api.domain.Election;
+import jbnu.se.api.domain.ElectionType;
+import jbnu.se.api.domain.ElectoralRoll;
+import jbnu.se.api.domain.Headquarter;
+import jbnu.se.api.domain.Member;
+import jbnu.se.api.domain.Period;
+import jbnu.se.api.domain.Voting;
 import jbnu.se.api.exception.AlreadyVotedException;
 import jbnu.se.api.exception.InvalidVotingResultException;
-import jbnu.se.api.exception.UnmatchedElectionTypeException;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
@@ -16,12 +26,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static java.time.LocalDateTime.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class SingleVotingServiceTest {
@@ -83,7 +87,6 @@ class SingleVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("agree");
-        votingRequest.setElectionType("SINGLE");
 
         singleVotingService.vote(voter, votingRequest);
 
@@ -131,49 +134,10 @@ class SingleVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("test");
-        votingRequest.setElectionType("SINGLE");
 
         // then
-        assertThatThrownBy(() -> singleVotingService.vote(voter, votingRequest)).isInstanceOf(InvalidVotingResultException.class);
-    }
-
-    @Test
-    @DisplayName("선거 종류가 맞지 않으면 오류")
-    void singleElectionTypeValidationTest() {
-        // given
-        Election election = Election.builder()
-                .title("test")
-                .period(new Period(of(2100, 1, 1, 0, 0),
-                        of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.SINGLE)
-                .build();
-
-        Election savedElection = electionRepository.save(election);
-
-        Headquarter headquarter = Headquarter.builder()
-                .name("test")
-                .election(savedElection)
-                .symbol("1")
-                .build();
-
-        headquarterRepository.save(headquarter);
-
-        Member voter = new Member("id", "name");
-
-        ElectoralRoll electoralRoll = new ElectoralRoll();
-        electoralRoll.setElection(election);
-        electoralRoll.setMember(voter);
-
-        electoralRollRepository.save(electoralRoll);
-
-        // when
-        VotingRequest votingRequest = new VotingRequest();
-        votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setResult("1");
-        votingRequest.setElectionType("PRIMARY");
-
-        // then
-        assertThatThrownBy(() -> singleVotingService.vote(voter, votingRequest)).isInstanceOf(UnmatchedElectionTypeException.class);
+        assertThatThrownBy(() -> singleVotingService.vote(voter, votingRequest)).isInstanceOf(
+                InvalidVotingResultException.class);
     }
 
     @Test
@@ -210,10 +174,10 @@ class SingleVotingServiceTest {
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
         votingRequest.setResult("agree");
-        votingRequest.setElectionType("SINGLE");
 
         // then
-        assertThatThrownBy(() -> singleVotingService.vote(voter, votingRequest)).isInstanceOf(AlreadyVotedException.class);
+        assertThatThrownBy(() -> singleVotingService.vote(voter, votingRequest)).isInstanceOf(
+                AlreadyVotedException.class);
     }
 
     @Test
@@ -257,7 +221,8 @@ class SingleVotingServiceTest {
         votingResultRequest.setElectionId(savedElection.getId());
         votingResultRequest.setElectionType("SINGLE");
 
-        SingleVotingResultResponse votingResult = (SingleVotingResultResponse) singleVotingService.getVotingResult(votingResultRequest);
+        SingleVotingResultResponse votingResult = (SingleVotingResultResponse) singleVotingService.getVotingResult(
+                votingResultRequest);
 
         // then
         assertThat(votingResult.getVoterCount()).isEqualTo(1);

@@ -1,8 +1,26 @@
 package jbnu.se.api.controller;
 
+import static java.time.LocalDateTime.of;
+import static jbnu.se.api.config.SampleAuthInfo.USER_ID;
+import static jbnu.se.api.config.SampleAuthInfo.USER_NAME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import jbnu.se.api.config.JwtUserRequestPostProcessor;
-import jbnu.se.api.domain.*;
+import jbnu.se.api.domain.Election;
+import jbnu.se.api.domain.ElectionType;
+import jbnu.se.api.domain.ElectoralRoll;
+import jbnu.se.api.domain.Headquarter;
+import jbnu.se.api.domain.Member;
+import jbnu.se.api.domain.Period;
+import jbnu.se.api.domain.Voting;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
@@ -17,19 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
-
-import static java.time.LocalDateTime.of;
-import static jbnu.se.api.config.SampleAuthInfo.USER_ID;
-import static jbnu.se.api.config.SampleAuthInfo.USER_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -95,7 +100,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("SINGLE");
         votingRequest.setResult("agree");
 
         // expected
@@ -150,7 +154,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("PRIMARY");
         votingRequest.setResult("1");
 
         // expected
@@ -198,7 +201,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("SINGLE");
         votingRequest.setResult("1");
 
         // expected
@@ -251,7 +253,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("PRIMARY");
         votingRequest.setResult("agree");
 
         // expected
@@ -263,105 +264,6 @@ class VotingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.message").value("유효하지 않은 투표 결과 입니다."))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("선거 종류가 맞지 않으면 오류 - 단선")
-    void singleElectionTypeValidationTest() throws Exception {
-        // given
-        Election election = Election.builder()
-                .title("test")
-                .period(new Period(of(2100, 1, 1, 0, 0),
-                        of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.SINGLE)
-                .build();
-
-        Election savedElection = electionRepository.save(election);
-
-        Headquarter headquarter = Headquarter.builder()
-                .name("test")
-                .election(savedElection)
-                .symbol("1")
-                .build();
-
-        headquarterRepository.save(headquarter);
-
-        Member voter = new Member(USER_ID, USER_NAME);
-
-        ElectoralRoll electoralRoll = new ElectoralRoll();
-        electoralRoll.setElection(election);
-        electoralRoll.setMember(voter);
-
-        electoralRollRepository.save(electoralRoll);
-
-        VotingRequest votingRequest = new VotingRequest();
-        votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("PRIMARY");
-        votingRequest.setResult("agree");
-
-        // expected
-        mockMvc.perform(post("/api/voting")
-                        .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
-                        .content(objectMapper.writeValueAsString(votingRequest))
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("선거 종류가 맞지 않습니다."))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("선거 종류가 맞지 않으면 오류 - 결선")
-    void primaryElectionTypeValidationTest() throws Exception {
-        // given
-        Election election = Election.builder()
-                .title("test")
-                .period(new Period(of(2100, 1, 1, 0, 0),
-                        of(2100, 1, 2, 0, 0)))
-                .electionType(ElectionType.PRIMARY)
-                .build();
-
-        Election savedElection = electionRepository.save(election);
-
-        Headquarter headquarter1 = Headquarter.builder()
-                .name("test1")
-                .election(savedElection)
-                .symbol("1")
-                .build();
-
-        Headquarter headquarter2 = Headquarter.builder()
-                .name("test2")
-                .election(savedElection)
-                .symbol("2")
-                .build();
-
-        headquarterRepository.save(headquarter1);
-        headquarterRepository.save(headquarter2);
-
-        Member voter = new Member(USER_ID, USER_NAME);
-
-        ElectoralRoll electoralRoll = new ElectoralRoll();
-        electoralRoll.setElection(election);
-        electoralRoll.setMember(voter);
-
-        electoralRollRepository.save(electoralRoll);
-
-        VotingRequest votingRequest = new VotingRequest();
-        votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("SINGLE");
-        votingRequest.setResult("1");
-
-        // expected
-        mockMvc.perform(post("/api/voting")
-                        .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
-                        .content(objectMapper.writeValueAsString(votingRequest))
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("선거 종류가 맞지 않습니다."))
                 .andDo(print());
     }
 
@@ -397,7 +299,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("SINGLE");
         votingRequest.setResult("agree");
 
         // expected
@@ -451,7 +352,6 @@ class VotingControllerTest {
 
         VotingRequest votingRequest = new VotingRequest();
         votingRequest.setElectionId(savedElection.getId());
-        votingRequest.setElectionType("PRIMARY");
         votingRequest.setResult("1");
 
         // expected
@@ -481,29 +381,7 @@ class VotingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.validation.electionId").value("선거 id를 입력해 주세요."))
-                .andExpect(jsonPath("$.validation.electionType").value("선거 종류를 입력해 주세요."))
                 .andExpect(jsonPath("$.validation.result").value("선거 결과를 입력해 주세요."))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("요청 데이터의 선거 종류 검증")
-    void electionTypeValidation() throws Exception {
-        // given
-        VotingRequest votingRequest = new VotingRequest();
-        votingRequest.setElectionId(1L);
-        votingRequest.setElectionType("test");
-        votingRequest.setResult("1");
-
-        // expected
-        mockMvc.perform(post("/api/voting")
-                        .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
-                        .content(objectMapper.writeValueAsString(votingRequest))
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.validation.electionType").value("유효하지 않은 선거 종류입니다."))
                 .andDo(print());
     }
 
