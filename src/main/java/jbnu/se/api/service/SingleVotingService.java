@@ -11,7 +11,6 @@ import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.repository.VotingRepository;
-import jbnu.se.api.request.VotingRequest;
 import jbnu.se.api.request.VotingResultRequest;
 import jbnu.se.api.response.SingleVotingResultResponse;
 import jbnu.se.api.response.VotingResultResponse;
@@ -34,8 +33,8 @@ public class SingleVotingService extends AbstractVotingService {
     }
 
     @Override
-    public boolean validResult(VotingRequest votingRequest) {
-        return RESULT_SET.contains(votingRequest.getResult());
+    public boolean validResult(Long electionId, String result) {
+        return RESULT_SET.contains(result);
     }
 
     @Override

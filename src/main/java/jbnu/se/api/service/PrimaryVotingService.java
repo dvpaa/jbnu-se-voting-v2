@@ -1,6 +1,8 @@
 package jbnu.se.api.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.domain.Headquarter;
@@ -10,7 +12,6 @@ import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.repository.ElectoralRollRepository;
 import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.repository.VotingRepository;
-import jbnu.se.api.request.VotingRequest;
 import jbnu.se.api.request.VotingResultRequest;
 import jbnu.se.api.response.HeadquarterResult;
 import jbnu.se.api.response.PrimaryVotingResultResponse;
@@ -32,14 +33,12 @@ public class PrimaryVotingService extends AbstractVotingService {
     }
 
     @Override
-    public boolean validResult(VotingRequest votingRequest) {
-        List<Headquarter> headquarters = headquarterRepository.findAllByElectionId(votingRequest.getElectionId());
+    public boolean validResult(Long electionId, String result) {
+        List<Headquarter> headquarters = headquarterRepository.findAllByElectionId(electionId);
 
-        List<String> symbols = headquarters.stream()
+        Set<String> symbols = headquarters.stream()
                 .map(Headquarter::getSymbol)
-                .toList();
-
-        String result = votingRequest.getResult();
+                .collect(Collectors.toSet());
 
         return result.equals("void") || symbols.contains(result);
     }

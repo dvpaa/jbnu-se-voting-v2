@@ -33,7 +33,7 @@ public abstract class AbstractVotingService implements VotingService {
         Election election = electionRepository.findById(votingRequest.getElectionId())
                 .orElseThrow(ElectionNotFoundException::new);
 
-        if (!validResult(votingRequest)) {
+        if (!validResult(votingRequest.getElectionId(), votingRequest.getResult())) {
             throw new InvalidVotingResultException();
         }
 

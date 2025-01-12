@@ -11,7 +11,7 @@ public interface VotingService {
 
     boolean supports(ElectionType type);
 
-    boolean validResult(VotingRequest votingRequest);
+    boolean validResult(Long electionId, String result);
 
     VotingResultResponse getVotingResult(VotingResultRequest votingResultRequest);
 }
