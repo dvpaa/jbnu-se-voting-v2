@@ -1,25 +1,5 @@
 package jbnu.se.api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jbnu.se.api.config.JwtAdminRequestPostProcessor;
-import jbnu.se.api.config.JwtUserRequestPostProcessor;
-import jbnu.se.api.domain.*;
-import jbnu.se.api.repository.CandidateRepository;
-import jbnu.se.api.repository.ElectionRepository;
-import jbnu.se.api.repository.HeadquarterRepository;
-import jbnu.se.api.request.*;
-import jbnu.se.api.util.JwtUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static java.time.LocalDateTime.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -29,15 +9,40 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import jbnu.se.api.domain.Candidate;
+import jbnu.se.api.domain.CandidateType;
+import jbnu.se.api.domain.Election;
+import jbnu.se.api.domain.ElectionType;
+import jbnu.se.api.domain.Grade;
+import jbnu.se.api.domain.Headquarter;
+import jbnu.se.api.domain.Period;
+import jbnu.se.api.repository.CandidateRepository;
+import jbnu.se.api.repository.ElectionRepository;
+import jbnu.se.api.repository.HeadquarterRepository;
+import jbnu.se.api.request.CandidatePair;
+import jbnu.se.api.request.CandidateRequest;
+import jbnu.se.api.request.ElectionIdRequest;
+import jbnu.se.api.request.HeadquarterCreateRequest;
+import jbnu.se.api.request.HeadquarterCreateRequests;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class HeadquarterControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -59,6 +64,7 @@ class HeadquarterControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("선본 등록에는 관리자 권한이 있어야 한다.")
     void headquarterRegisterRoleTest() throws Exception {
         // given
@@ -85,7 +91,6 @@ class HeadquarterControllerTest {
         // expected
         mockMvc.perform(post("/api/admin/headquarters")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isForbidden())
@@ -93,6 +98,7 @@ class HeadquarterControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("관리자는 선본을 정상적으로 등록한다.")
     void registerHeadquarterTest() throws Exception {
         // given
@@ -124,7 +130,6 @@ class HeadquarterControllerTest {
         // expected
         mockMvc.perform(post("/api/admin/headquarters")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isCreated())
@@ -138,6 +143,7 @@ class HeadquarterControllerTest {
 
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("선본에 등록된 후보를 가져온다.")
     void getHeadquartersByElectionTest() throws Exception {
         // given
@@ -149,8 +155,6 @@ class HeadquarterControllerTest {
                 .build();
 
         Election savedElection = electionRepository.save(election);
-
-        System.out.println("savedElectioin - eid = " + savedElection.getId());
 
         Headquarter headquarter = Headquarter.builder()
                 .election(savedElection)
@@ -176,7 +180,6 @@ class HeadquarterControllerTest {
                         .build())
                 .build();
 
-
         CandidateRequest presidentInfo = candidatePairs.getPresident();
         CandidateRequest vicePresidentInfo = candidatePairs.getVicePresident();
         Candidate president = new Candidate(presidentInfo, savedHeadquarter);
@@ -190,7 +193,6 @@ class HeadquarterControllerTest {
 
         // expected
         mockMvc.perform(get("/api/headquarters", savedElection.getId())
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionIdRequest))
                 )
@@ -202,12 +204,13 @@ class HeadquarterControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("선본 등록 요청시 값이 존재해야 한다.")
     void headquarterRequestValidationTest() throws Exception {
         // given
         HeadquarterCreateRequests request = new HeadquarterCreateRequests();
         request.setHeadquarters(
-                Arrays.asList(
+                Collections.singletonList(
                         HeadquarterCreateRequest.builder()
                                 .build()
                 )
@@ -215,7 +218,6 @@ class HeadquarterControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/headquarters")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                 )

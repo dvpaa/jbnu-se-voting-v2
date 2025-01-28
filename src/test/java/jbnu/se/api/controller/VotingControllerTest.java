@@ -1,10 +1,9 @@
 package jbnu.se.api.controller;
 
 import static java.time.LocalDateTime.of;
-import static jbnu.se.api.config.SampleAuthInfo.USER_ID;
-import static jbnu.se.api.config.SampleAuthInfo.USER_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import jbnu.se.api.config.JwtUserRequestPostProcessor;
+import jbnu.se.api.config.MockSecurity;
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.ElectionType;
 import jbnu.se.api.domain.ElectoralRoll;
@@ -27,13 +26,13 @@ import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.repository.VotingRepository;
 import jbnu.se.api.request.VotingRequest;
 import jbnu.se.api.request.VotingResultRequest;
-import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -42,9 +41,6 @@ class VotingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -90,7 +86,7 @@ class VotingControllerTest {
 
         headquarterRepository.save(headquarter);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -105,7 +101,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isCreated())
@@ -113,7 +109,7 @@ class VotingControllerTest {
 
         List<Voting> all = votingRepository.findAll();
         assertThat(all).hasSize(1);
-        assertThat(all.get(0).getElection().getId()).isEqualTo(savedElection.getId());
+        assertThat(all.getFirst().getElection().getId()).isEqualTo(savedElection.getId());
     }
 
     @Test
@@ -144,7 +140,7 @@ class VotingControllerTest {
         headquarterRepository.save(headquarter1);
         headquarterRepository.save(headquarter2);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -159,7 +155,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isCreated())
@@ -167,7 +163,7 @@ class VotingControllerTest {
 
         List<Voting> all = votingRepository.findAll();
         assertThat(all).hasSize(1);
-        assertThat(all.get(0).getElection().getId()).isEqualTo(savedElection.getId());
+        assertThat(all.getFirst().getElection().getId()).isEqualTo(savedElection.getId());
     }
 
     @Test
@@ -191,7 +187,7 @@ class VotingControllerTest {
 
         headquarterRepository.save(headquarter);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -206,7 +202,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isBadRequest())
@@ -243,7 +239,7 @@ class VotingControllerTest {
         headquarterRepository.save(headquarter1);
         headquarterRepository.save(headquarter2);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -258,7 +254,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isBadRequest())
@@ -288,7 +284,7 @@ class VotingControllerTest {
 
         headquarterRepository.save(headquarter);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -304,7 +300,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isForbidden())
@@ -341,7 +337,7 @@ class VotingControllerTest {
         headquarterRepository.save(headquarter1);
         headquarterRepository.save(headquarter2);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -357,7 +353,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isForbidden())
@@ -375,7 +371,7 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(post("/api/voting")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(MockSecurity.makeUserToken()))
                         .content(objectMapper.writeValueAsString(votingRequest))
                 )
                 .andExpect(status().isBadRequest())
@@ -386,6 +382,7 @@ class VotingControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("단선-투표 결과 조회")
     void singleVoteResultTest() throws Exception {
         // given
@@ -406,7 +403,7 @@ class VotingControllerTest {
 
         headquarterRepository.save(headquarter);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -427,7 +424,6 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(get("/api/voting/count")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .content(objectMapper.writeValueAsString(votingResultRequest))
                 )
                 .andExpect(status().isOk())
@@ -439,6 +435,7 @@ class VotingControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("결선-투표 결과 조회")
     void primaryVoteResultTest() throws Exception {
         // given
@@ -466,7 +463,7 @@ class VotingControllerTest {
         headquarterRepository.save(headquarter1);
         headquarterRepository.save(headquarter2);
 
-        Member voter = new Member(USER_ID, USER_NAME);
+        Member voter = new Member(MockSecurity.USER_ID, MockSecurity.USER_NAME);
 
         ElectoralRoll electoralRoll = new ElectoralRoll();
         electoralRoll.setElection(election);
@@ -488,7 +485,6 @@ class VotingControllerTest {
         // expected
         mockMvc.perform(get("/api/voting/count")
                         .contentType(APPLICATION_JSON)
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .content(objectMapper.writeValueAsString(votingResultRequest))
                 )
                 .andExpect(status().isOk())

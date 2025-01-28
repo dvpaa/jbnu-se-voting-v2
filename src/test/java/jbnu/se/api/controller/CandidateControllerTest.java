@@ -1,8 +1,15 @@
 package jbnu.se.api.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jbnu.se.api.config.JwtAdminRequestPostProcessor;
-import jbnu.se.api.config.JwtUserRequestPostProcessor;
+import java.util.Collections;
+import java.util.List;
 import jbnu.se.api.domain.Candidate;
 import jbnu.se.api.domain.CandidateType;
 import jbnu.se.api.domain.Grade;
@@ -12,24 +19,14 @@ import jbnu.se.api.repository.HeadquarterRepository;
 import jbnu.se.api.request.CandidatePair;
 import jbnu.se.api.request.CandidatePairRequests;
 import jbnu.se.api.request.CandidateRequest;
-import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,9 +34,6 @@ class CandidateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -57,6 +51,7 @@ class CandidateControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("후보 등록에는 관리자 권한이 있어야 한다.")
     void candidateRegisterRoleTest() throws Exception {
         // given
@@ -67,7 +62,7 @@ class CandidateControllerTest {
 
         Headquarter saved = headquarterRepository.save(headquarter);
 
-        List<CandidatePair> candidatePairs = Arrays.asList(
+        List<CandidatePair> candidatePairs = Collections.singletonList(
                 CandidatePair.builder()
                         .headquarterId(saved.getId())
                         .president(CandidateRequest.builder()
@@ -87,7 +82,6 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(candidatePairs))
                 )
@@ -96,6 +90,7 @@ class CandidateControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("관리자는 후보를 정상적으로 등록한다.")
     void registerCandidateTest() throws Exception {
         // given
@@ -108,7 +103,7 @@ class CandidateControllerTest {
 
         CandidatePairRequests requests = new CandidatePairRequests();
         requests.setCandidates(
-                Arrays.asList(
+                Collections.singletonList(
                         CandidatePair.builder()
                                 .headquarterId(saved.getId())
                                 .president(CandidateRequest.builder()
@@ -129,7 +124,6 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
                 )
@@ -143,12 +137,13 @@ class CandidateControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("후보 등록 요청시 후보 정보가 존재해야 한다.")
     void candidateRequestsValidationTest() throws Exception {
         // given
         CandidatePairRequests requests = new CandidatePairRequests();
         requests.setCandidates(
-                Arrays.asList(
+                Collections.singletonList(
                         CandidatePair.builder()
                                 .build()
                 )
@@ -156,7 +151,6 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
                 )
@@ -169,6 +163,7 @@ class CandidateControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("후보 정보에 값들이 존재해야 한다.")
     void candidateRequestValidationTest() throws Exception {
         // given
@@ -181,7 +176,7 @@ class CandidateControllerTest {
 
         CandidatePairRequests requests = new CandidatePairRequests();
         requests.setCandidates(
-                Arrays.asList(
+                Collections.singletonList(
                         CandidatePair.builder()
                                 .headquarterId(saved.getId())
                                 .president(CandidateRequest.builder()
@@ -194,7 +189,6 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
                 )
@@ -207,11 +201,13 @@ class CandidateControllerTest {
                 .andExpect(jsonPath("$.validation['candidates[0].vicePresident.name']").value("이름을 입력해 주세요."))
                 .andExpect(jsonPath("$.validation['candidates[0].vicePresident.studentId']").value("학번을 입력해 주세요."))
                 .andExpect(jsonPath("$.validation['candidates[0].vicePresident.grade']").value("학년을 입력해 주세요."))
-                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value("선거 종류를 입력해 주세요."))
+                .andExpect(
+                        jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value("선거 종류를 입력해 주세요."))
                 .andDo(print());
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("유효하지 않은 학년은 입력될 수 없다.")
     void gradeValidationTest() throws Exception {
         // given
@@ -224,7 +220,7 @@ class CandidateControllerTest {
 
         CandidatePairRequests requests = new CandidatePairRequests();
         requests.setCandidates(
-                Arrays.asList(
+                Collections.singletonList(
                         CandidatePair.builder()
                                 .headquarterId(saved.getId())
                                 .president(CandidateRequest.builder()
@@ -245,7 +241,6 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
                 )
@@ -257,6 +252,7 @@ class CandidateControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "name", roles = {"ADMIN"})
     @DisplayName("유효하지 않은 후보 종류는 입력될 수 없다.")
     void candidateTypeValidationTest() throws Exception {
         // given
@@ -269,7 +265,7 @@ class CandidateControllerTest {
 
         CandidatePairRequests requests = new CandidatePairRequests();
         requests.setCandidates(
-                Arrays.asList(
+                Collections.singletonList(
                         CandidatePair.builder()
                                 .headquarterId(saved.getId())
                                 .president(CandidateRequest.builder()
@@ -290,15 +286,14 @@ class CandidateControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/candidates")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requests))
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.validation['candidates[0].president.candidateType']").value("유효하지 않은 후보 종류입니다."))
-                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value("유효하지 않은 후보 종류입니다."))
+                .andExpect(jsonPath("$.validation['candidates[0].vicePresident.candidateType']").value(
+                        "유효하지 않은 후보 종류입니다."))
                 .andDo(print());
     }
-
 }

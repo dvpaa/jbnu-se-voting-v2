@@ -1,37 +1,37 @@
 package jbnu.se.api.controller;
 
+import static java.time.LocalDateTime.of;
+import static jbnu.se.api.config.MockSecurity.makeAdminToken;
+import static jbnu.se.api.config.MockSecurity.makeUserToken;
+import static jbnu.se.api.domain.ElectionType.SINGLE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jbnu.se.api.config.JwtAdminRequestPostProcessor;
-import jbnu.se.api.config.JwtUserRequestPostProcessor;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import jbnu.se.api.domain.Election;
 import jbnu.se.api.domain.Period;
 import jbnu.se.api.repository.ElectionRepository;
 import jbnu.se.api.request.ElectionRequest;
 import jbnu.se.api.request.PeriodRequest;
-import jbnu.se.api.util.JwtUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static java.time.LocalDateTime.of;
-import static jbnu.se.api.domain.ElectionType.SINGLE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,9 +42,6 @@ class ElectionControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtUtils jwtUtils;
 
     @Autowired
     private ElectionRepository electionRepository;
@@ -69,7 +66,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
+                        .with(authentication(makeUserToken()))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest))
                 )
@@ -92,7 +89,7 @@ class ElectionControllerTest {
 
         // when
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest))
                 )
@@ -102,13 +99,14 @@ class ElectionControllerTest {
         // then
         assertThat(electionRepository.count()).isEqualTo(1L);
 
-        Election election = electionRepository.findAll().get(0);
+        Election election = electionRepository.findAll().getFirst();
         assertThat(election.getTitle()).isEqualTo(electionRequest.getTitle());
         assertThat(election.getPeriod().getStartDate()).isEqualTo(electionRequest.getPeriod().getStartDate());
         assertThat(election.getPeriod().getEndDate()).isEqualTo(electionRequest.getPeriod().getEndDate());
     }
 
     @Test
+    @WithMockUser(username = "name")
     @DisplayName("등록된 선거를 가져온다")
     void getAllElectionsTest() throws Exception {
         Election election = Election.builder()
@@ -120,9 +118,7 @@ class ElectionControllerTest {
         electionRepository.save(election);
 
         // when
-        MvcResult mvcResult = mockMvc.perform(get("/api/elections")
-                        .with(JwtUserRequestPostProcessor.jwtUser(jwtUtils))
-                )
+        MvcResult mvcResult = mockMvc.perform(get("/api/elections"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -144,7 +140,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest())
@@ -164,7 +160,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isBadRequest())
@@ -185,7 +181,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))
                 .andExpect(status().isBadRequest())
@@ -209,7 +205,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))
                 .andExpect(status().isBadRequest())
@@ -233,7 +229,7 @@ class ElectionControllerTest {
 
         // expected
         mockMvc.perform(post("/api/admin/elections")
-                        .with(JwtAdminRequestPostProcessor.jwtAdmin(jwtUtils))
+                        .with(authentication(makeAdminToken()))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(electionRequest)))
                 .andExpect(status().isBadRequest())
