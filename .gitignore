@@ -48,3 +48,5 @@ out/
 /src/test/java/jbnu/se/api/config/SampleAuthInfo.java
 
 /src/main/resources/*.json
+
+/src/test/java/jbnu/se/api/controller/AuthControllerTest.java

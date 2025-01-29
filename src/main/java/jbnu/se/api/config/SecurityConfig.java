@@ -1,6 +1,13 @@
 package jbnu.se.api.config;
 
-import jbnu.se.api.security.*;
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+import static org.springframework.http.HttpMethod.POST;
+
+import jbnu.se.api.security.ExceptionResponseHandler;
+import jbnu.se.api.security.JwtFilter;
+import jbnu.se.api.security.OasisAccessDeniedHandler;
+import jbnu.se.api.security.OasisAuthenticationProvider;
+import jbnu.se.api.security.OasisLoginFilter;
 import jbnu.se.api.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +21,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
-import static org.springframework.http.HttpMethod.POST;
+import org.springframework.web.client.RestClient;
 
 @Configuration
 @EnableWebSecurity
@@ -26,7 +30,7 @@ public class SecurityConfig {
 
     private final AuthProperties authProperties;
 
-    private final WebClient webClient;
+    private final RestClient restClient;
 
     private final AuthenticationConfiguration authenticationConfiguration;
 
@@ -74,7 +78,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        return new OasisAuthenticationProvider(authProperties, webClient);
+        return new OasisAuthenticationProvider(authProperties, restClient);
     }
 
     @Bean

@@ -1,5 +1,7 @@
 package jbnu.se.api.security;
 
+import java.util.Collections;
+import java.util.List;
 import jbnu.se.api.config.AuthProperties;
 import jbnu.se.api.exception.FailureApiCallException;
 import jbnu.se.api.exception.UnauthorizedException;
@@ -10,18 +12,14 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.util.Collections;
-import java.util.List;
+import org.springframework.web.client.RestClient;
 
 @RequiredArgsConstructor
 public class OasisAuthenticationProvider implements AuthenticationProvider {
 
     private final AuthProperties authProperties;
 
-    private final WebClient webClient;
+    private final RestClient restClient;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -31,7 +29,8 @@ public class OasisAuthenticationProvider implements AuthenticationProvider {
         if (isAdmin(username, password)) {
             UserPrincipal adminPrincipal = makeAdminPrincipal();
 
-            return OasisAuthenticationToken.authenticated(username, password, adminPrincipal, getSingleAuthority("ROLE_ADMIN"));
+            return OasisAuthenticationToken.authenticated(username, password, adminPrincipal,
+                    getSingleAuthority("ROLE_ADMIN"));
         }
 
         OasisApiRequest oasisApiRequest = makeApiRequest(username, password);
@@ -47,7 +46,8 @@ public class OasisAuthenticationProvider implements AuthenticationProvider {
 
         UserPrincipal userPrincipal = makeUserInfo(oasisApiResponse);
 
-        return OasisAuthenticationToken.authenticated(username, password, userPrincipal, getSingleAuthority("ROLE_USER"));
+        return OasisAuthenticationToken.authenticated(username, password, userPrincipal,
+                getSingleAuthority("ROLE_USER"));
     }
 
     private boolean isValidUser(OasisApiResponse oasisApiResponse) {
@@ -64,18 +64,18 @@ public class OasisAuthenticationProvider implements AuthenticationProvider {
 
     private UserPrincipal makeUserInfo(OasisApiResponse oasisApiResponse) {
         return UserPrincipal.builder()
-                .userId(oasisApiResponse.getUsers().get(0).getStudentId())
-                .username(oasisApiResponse.getUsers().get(0).getStudentName())
+                .userId(oasisApiResponse.getUsers().getFirst().getStudentId())
+                .username(oasisApiResponse.getUsers().getFirst().getStudentName())
                 .role("ROLE_USER")
                 .build();
     }
 
     private OasisApiResponse callOasisApi(OasisApiRequest oasisApiRequest) {
-        return webClient.post()
-                .body(Mono.just(oasisApiRequest), OasisApiRequest.class)
+        return restClient.post()
+                .uri("")
+                .body(oasisApiRequest)
                 .retrieve()
-                .bodyToMono(OasisApiResponse.class)
-                .block();
+                .body(OasisApiResponse.class);
     }
 
     private OasisApiRequest makeApiRequest(String username, String password) {
